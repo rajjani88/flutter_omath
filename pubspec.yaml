@@ -1,0 +1,63 @@
+name: flutter_omath
+description: "A New Version of already uploeded application OMath puzzle app"
+
+publish_to: 'none' 
+
+#v1.2 = Game moved to Flutter
+version: 1.2.0+2
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+  provider: 
+  google_fonts:
+  go_router: 
+  fluttertoast: 
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+
+  uses-material-design: true
+  assets:
+      - assets/images/
+      - assets/game_data/
+  
+  
+  
+  
+
+  
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
