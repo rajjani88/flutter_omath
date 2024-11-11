@@ -1,0 +1,4 @@
+storePassword=raj5848
+keyPassword=raj5848
+keyAlias=omath
+storeFile=/Users/rajjani/Desktop/android_projects/flutter_omath/KEY_STORE/omath1.jks

@@ -18,6 +18,10 @@ dependencies:
   google_fonts:
   go_router: 
   fluttertoast: 
+  url_launcher: 
+  share_plus: 
+  assets_audio_player: 
+  animated_button: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +35,7 @@ flutter:
   assets:
       - assets/images/
       - assets/game_data/
+      - assets/music/
   
   
   
