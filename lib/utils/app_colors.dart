@@ -8,3 +8,5 @@ const mWhitecolor = Colors.white;
 
 const mGreenColor = Colors.green;
 const mRedColor = Colors.red;
+
+const mAppBlue = Color(0xff1E73BE);
