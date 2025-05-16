@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/screens/splash/splash.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'utils/get_di.dart' as getit;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  getit.init();
   runApp(const MyApp());
 }
 
@@ -11,7 +14,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Brainy Math',
       theme: ThemeData(

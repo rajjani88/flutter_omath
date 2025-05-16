@@ -10,3 +10,4 @@ const mGreenColor = Colors.green;
 const mRedColor = Colors.red;
 
 const mAppBlue = Color(0xff1E73BE);
+const mAppBlueLight = Color.fromARGB(140, 30, 115, 190);

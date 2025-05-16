@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/commons/privacy_terms_row.dart';
+import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/utils/app_colors.dart';
 import 'package:flutter_omath/utils/consts.dart';
+import 'package:get/get.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -17,10 +20,13 @@ class SplashScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    imgLogoTr,
-                    height: 240,
-                    width: 240,
+                  Hero(
+                    tag: 'logo',
+                    child: Image.asset(
+                      imgLogoTr,
+                      height: 240,
+                      width: 240,
+                    ),
                   ),
                 ],
               ),
@@ -54,7 +60,9 @@ class SplashScreen extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14))),
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.to(() => const HomeScreen());
+                          },
                           child: const Padding(
                             padding: EdgeInsets.all(14.0),
                             child: Text(
@@ -71,31 +79,7 @@ class SplashScreen extends StatelessWidget {
                 const SizedBox(
                   height: 18,
                 ),
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Privacy Policy',
-                        style: TextStyle(
-                            color: mLisghWhiteColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Terms of Use',
-                        style: TextStyle(
-                            color: mLisghWhiteColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    )
-                  ],
-                ),
+                const PrivacyTermsRow(),
                 const SizedBox(
                   height: 16,
                 ),
