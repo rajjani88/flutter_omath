@@ -126,4 +126,9 @@ class ArrangeNumberController extends GetxController implements GetxService {
         backgroundColor: mRedColor, colorText: mWhitecolor);
     resetGame();
   }
+
+  disposeGame() {
+    resetGame();
+    gameTimer.cancel();
+  }
 }
