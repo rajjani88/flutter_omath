@@ -105,7 +105,11 @@ class ArrangeNumberController extends GetxController implements GetxService {
   }
 
   void startTimer() {
-    gameTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+    if (remainingTime.value == 0) {
+      remainingTime.value = 30;
+    }
+
+    gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (remainingTime.value > 0) {
         remainingTime.value--;
       } else {
@@ -129,6 +133,8 @@ class ArrangeNumberController extends GetxController implements GetxService {
 
   disposeGame() {
     resetGame();
-    gameTimer.cancel();
+    if (gameTimer.isActive) {
+      gameTimer.cancel();
+    }
   }
 }
