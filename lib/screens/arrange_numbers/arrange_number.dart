@@ -191,12 +191,6 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
                 ),
               )),
           const SizedBox(height: 30),
-
-          // Reset Button
-          ElevatedButton(
-            onPressed: controller.resetGame,
-            child: const Text('Reset'),
-          ),
         ],
       ),
     );

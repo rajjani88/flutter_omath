@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/rajjani/Developer/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/rajjani/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/rajjani/Desktop/android_projects/omath_game_project/flutter_omath/android/app/.cxx/RelWithDebInfo/5p6ngb4k/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/rajjani/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/rajjani/Desktop/android_projects/omath_game_project/flutter_omath/android/app/.cxx/RelWithDebInfo/5p6ngb4k/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

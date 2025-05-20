@@ -13,3 +13,9 @@ const imgLogoTr = "$baseImgPath/logo_tr.png";
 const imgNumber = "$baseImgPath/number.png";
 
 const imgcalculator = "$baseImgPath/calculator.png";
+
+//privacy policy
+const urlPrivacy =
+    'https://sites.google.com/view/brainy-math-app/privacy-policy';
+const urlTerms =
+    "https://sites.google.com/view/brainy-math-app/terms-and-conditions";

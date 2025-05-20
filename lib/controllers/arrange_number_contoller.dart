@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:collection/collection.dart';
 import 'package:flutter_omath/models/order_type.dart';
 import 'package:flutter_omath/utils/app_colors.dart';
 import 'package:get/get.dart';
@@ -64,6 +62,7 @@ class ArrangeNumberController extends GetxController implements GetxService {
   void resetGame() {
     numberPool.assignAll([...originalNumbers]..shuffle());
     userSelection.assignAll(List.filled(originalNumbers.length, null));
+    remainingTime.value = 0;
   }
 
   // void validateAnswer() {

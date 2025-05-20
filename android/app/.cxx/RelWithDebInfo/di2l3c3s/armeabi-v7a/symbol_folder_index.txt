@@ -1,0 +1,1 @@
+/Users/rajjani/Desktop/android_projects/omath_game_project/flutter_omath/build/app/intermediates/cxx/RelWithDebInfo/di2l3c3s/obj/armeabi-v7a

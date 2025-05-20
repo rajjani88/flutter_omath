@@ -1,0 +1,2 @@
+/Users/rajjani/Desktop/android_projects/omath_game_project/flutter_omath/android/app/.cxx/RelWithDebInfo/di2l3c3s/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/rajjani/Desktop/android_projects/omath_game_project/flutter_omath/android/app/.cxx/RelWithDebInfo/di2l3c3s/arm64-v8a/CMakeFiles/rebuild_cache.dir

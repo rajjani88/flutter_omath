@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/utils/app_colors.dart';
+import 'package:flutter_omath/utils/consts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PrivacyTermsRow extends StatelessWidget {
   const PrivacyTermsRow({
     super.key,
   });
 
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url), mode: LaunchMode.inAppWebView)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            _launchUrl(urlPrivacy);
+          },
           child: const Text(
             'Privacy Policy',
             style: TextStyle(
@@ -22,7 +32,9 @@ class PrivacyTermsRow extends StatelessWidget {
         ),
         const Spacer(),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            _launchUrl(urlTerms);
+          },
           child: const Text(
             'Terms of Use',
             style: TextStyle(

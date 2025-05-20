@@ -4,7 +4,8 @@ description: "A New Version of already uploeded application OMath puzzle app"
 publish_to: 'none' 
 
 #v1.2 = Game moved to Flutter
-version: 1.2.0+2
+#v1.3 = Game redesigned
+version: 1.3.0+3
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -16,6 +17,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   get: ^4.7.2
   collection: ^1.19.1
+  url_launcher: ^6.3.1
  
 
 dev_dependencies:
