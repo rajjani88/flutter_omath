@@ -5,7 +5,8 @@ publish_to: 'none'
 
 #v1.2 = Game moved to Flutter
 #v1.3 = Game redesigned
-version: 1.3.0+3
+#v1.4 = Mathwize
+version: 1.4.0+4
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

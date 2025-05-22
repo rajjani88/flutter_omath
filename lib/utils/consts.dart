@@ -1,4 +1,4 @@
-const String appName = "Brainy Math";
+const String appName = "Mathwize";
 
 const scoreUpdate = 10;
 
