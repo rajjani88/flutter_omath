@@ -12,6 +12,9 @@ const imgLogo = "assets/images/logo.png";
 const imgLogoTr = "$baseImgPath/logo_tr.png";
 const imgNumber = "$baseImgPath/number.png";
 
+const imgMathgrid = "$baseImgPath/math_grid.png";
+const imgMathmaze = "$baseImgPath/math_maze.png";
+
 const imgcalculator = "$baseImgPath/calculator.png";
 
 //privacy policy

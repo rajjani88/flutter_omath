@@ -29,8 +29,8 @@ class BuildGameOption extends StatelessWidget {
               children: [
                 Image.asset(
                   imgName,
-                  height: 80,
-                  width: 80,
+                  height: 60,
+                  width: 60,
                 ),
                 const SizedBox(
                   width: 16,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/screens/splash/splash.dart';
+import 'package:flutter_omath/utils/consts.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'utils/get_di.dart' as getit;
 
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Brainy Math',
+      title: appName,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
