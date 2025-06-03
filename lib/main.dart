@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_omath/screens/splash/splash.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'utils/get_di.dart' as getit;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
   getit.init();
   runApp(const MyApp());
 }

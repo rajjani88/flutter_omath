@@ -4,9 +4,10 @@ import 'package:flutter_omath/utils/consts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PrivacyTermsRow extends StatelessWidget {
-  const PrivacyTermsRow({
-    super.key,
-  });
+  final bool showRestore;
+  final Function()? onRestoreClick;
+  const PrivacyTermsRow(
+      {super.key, this.showRestore = false, this.onRestoreClick});
 
   Future<void> _launchUrl(String url) async {
     if (!await launchUrl(Uri.parse(url), mode: LaunchMode.inAppWebView)) {
@@ -24,6 +25,17 @@ class PrivacyTermsRow extends StatelessWidget {
           },
           child: const Text(
             'Privacy Policy',
+            style: TextStyle(
+                color: mLisghWhiteColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w600),
+          ),
+        ),
+        const Spacer(),
+        TextButton(
+          onPressed: onRestoreClick,
+          child: const Text(
+            'Restore',
             style: TextStyle(
                 color: mLisghWhiteColor,
                 fontSize: 14,

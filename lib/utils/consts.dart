@@ -16,6 +16,7 @@ const imgMathgrid = "$baseImgPath/math_grid.png";
 const imgMathmaze = "$baseImgPath/math_maze.png";
 
 const imgcalculator = "$baseImgPath/calculator.png";
+const imgPro = "$baseImgPath/pro.png";
 
 //privacy policy
 const urlPrivacy =

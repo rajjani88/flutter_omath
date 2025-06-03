@@ -7,6 +7,9 @@
         android:label="Mathwize"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-4035340144253699~7863340237"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

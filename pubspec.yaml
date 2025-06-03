@@ -7,7 +7,8 @@ publish_to: 'none'
 #v1.3 = Game redesigned
 #v1.4 = Mathwize
 #v1.5 = two new game modes
-version: 1.5.0+6
+#v1.7 = inapp purchase and ads integration.
+version: 1.7.0+7
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -22,6 +23,8 @@ dependencies:
   url_launcher: ^6.3.1
   fluttertoast: ^8.2.12
   in_app_purchase: ^3.2.3
+  google_mobile_ads: ^6.0.0
+  shared_preferences: ^2.5.3
  
 
 dev_dependencies:
