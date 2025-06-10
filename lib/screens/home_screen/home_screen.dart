@@ -10,6 +10,7 @@ import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 import 'package:flutter_omath/screens/home_screen/widgets/build_game_option.dart';
 import 'package:flutter_omath/screens/math_grid/math_grid_find_number_screen.dart';
 import 'package:flutter_omath/screens/math_maze/math_maze_view.dart';
+import 'package:flutter_omath/screens/true_false/true_false_game_screen.dart';
 import 'package:flutter_omath/utils/app_colors.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
@@ -59,10 +60,35 @@ class _HomeScreenState extends State<HomeScreen> {
             title: 'Math Grid (3x3)',
             subTitle: 'Find Correct number from Grid',
             onTap: () {
-              Get.to(() => const MathGridFindNumber());
+              if (purchaseController.isPro.value) {
+                Get.to(() => const ArrangeNumber());
+                return;
+              }
+              if (adsController.isInterstitialAdLoaded.value) {
+                adsController.showInterstitialAd();
+                Get.to(() => const MathGridFindNumber());
+              }
             },
             imgName: imgMathgrid,
           ),
+          const SizedBox(
+            height: 14,
+          ),
+
+          BuildGameOption(
+              title: 'True or False',
+              subTitle: 'can you find statement is True or False ?',
+              onTap: () {
+                if (purchaseController.isPro.value) {
+                  Get.to(() => const TrueFalseGame());
+                  return;
+                }
+                if (adsController.isInterstitialAdLoaded.value) {
+                  adsController.showInterstitialAd();
+                  Get.to(() => const TrueFalseGame());
+                }
+              },
+              imgName: imgTrueOrFalse),
           const SizedBox(
             height: 14,
           ),
@@ -88,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
                 onGoPro: () {
-                  Get.to(() => GoProScreen());
+                  Get.to(() => const GoProScreen());
                 },
               );
             },
@@ -120,7 +146,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           'Ad not ready', 'Please try again in a moment');
                     }
                   },
-                  onGoPro: () {},
+                  onGoPro: () {
+                    Get.to(() => const GoProScreen());
+                  },
                 );
               },
               imgName: imgcalculator),
@@ -150,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
                 onGoPro: () {
-                  Get.to(() => GoProScreen());
+                  Get.to(() => const GoProScreen());
                 },
               );
             },

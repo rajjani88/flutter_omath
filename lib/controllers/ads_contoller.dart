@@ -17,8 +17,9 @@ class AdsController extends GetxController implements GetxService {
   var coinsEarnedFromAds = 0.obs;
 
   // Ad unit IDs (replace these with your AdMob ad unit IDs)
-  final String bannerAdUnitId = ""; //live
-  final String interstitialAdUnitId = ""; //live
+  final String bannerAdUnitId = "ca-app-pub-4035340144253699/2171011928"; //live
+  final String interstitialAdUnitId =
+      "ca-app-pub-4035340144253699/3644709841"; //live
   final String rewardedAdUnitId =
       //  "ca-app-pub-3940256099942544/5224354917"; //test
       "ca-app-pub-4035340144253699/4437673496"; //live
@@ -41,7 +42,7 @@ class AdsController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     // _loadBannerAd();
-    //  _loadInterstitialAd();
+    _loadInterstitialAd();
     _loadRewardedAd();
 
     // _loadBannerAd1();

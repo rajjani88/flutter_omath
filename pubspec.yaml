@@ -8,7 +8,8 @@ publish_to: 'none'
 #v1.4 = Mathwize
 #v1.5 = two new game modes
 #v1.7 = inapp purchase and ads integration.
-version: 1.7.0+7
+#1.8 = New game mode true and false
+version: 1.8.0+8
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

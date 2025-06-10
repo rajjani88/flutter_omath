@@ -17,6 +17,7 @@ const imgMathmaze = "$baseImgPath/math_maze.png";
 
 const imgcalculator = "$baseImgPath/calculator.png";
 const imgPro = "$baseImgPath/pro.png";
+const imgTrueOrFalse = "$baseImgPath/true_false_brain.png";
 
 //privacy policy
 const urlPrivacy =

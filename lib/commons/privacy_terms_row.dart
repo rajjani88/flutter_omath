@@ -32,14 +32,17 @@ class PrivacyTermsRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        TextButton(
-          onPressed: onRestoreClick,
-          child: const Text(
-            'Restore',
-            style: TextStyle(
-                color: mLisghWhiteColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w600),
+        Visibility(
+          visible: showRestore,
+          child: TextButton(
+            onPressed: onRestoreClick,
+            child: const Text(
+              'Restore',
+              style: TextStyle(
+                  color: mLisghWhiteColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600),
+            ),
           ),
         ),
         const Spacer(),
