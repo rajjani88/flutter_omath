@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:get/get.dart';
 
 class MathMazeController extends GetxController {
@@ -51,6 +52,8 @@ class MathMazeController extends GetxController {
     movesMade.value++;
 
     if (movesMade.value == moveLimit) {
+      Get.find<AdsController>().showInterstitialAd();
+
       if (currentNumber.value == targetNumber.value) {
         level++;
         Get.defaultDialog(

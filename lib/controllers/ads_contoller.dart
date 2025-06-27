@@ -1,3 +1,4 @@
+import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -38,16 +39,15 @@ class AdsController extends GetxController implements GetxService {
   final String bannerAdUnitId2 = ""; //live
   final String bannerAdUnitId3 = "";
 
+  final Sharedprefs sp;
+
+  AdsController({required this.sp});
+
   @override
   void onInit() {
     super.onInit();
-    // _loadBannerAd();
     _loadInterstitialAd();
     _loadRewardedAd();
-
-    // _loadBannerAd1();
-    // _loadBannerAd2();
-    // _loadBannerAd3();
   }
 
   // Load Banner Ad
@@ -190,6 +190,9 @@ class AdsController extends GetxController implements GetxService {
 
   // Show Interstitial Ad
   void showInterstitialAd() {
+    if (sp.userType) {
+      return;
+    }
     if (isInterstitialAdLoaded.value) {
       interstitialAd?.show();
       isInterstitialAdLoaded.value = false;
@@ -201,6 +204,9 @@ class AdsController extends GetxController implements GetxService {
 
   // Show Rewarded Ad
   void showRewardedAd({Function()? onRewardGranted}) {
+    if (sp.userType) {
+      return;
+    }
     if (isRewardedAdLoaded.value) {
       rewardedAd?.show(
         onUserEarnedReward: (ad, reward) {

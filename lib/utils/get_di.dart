@@ -30,7 +30,7 @@ Future<void> init() async {
     () => MathMazeController(),
   );
 
-  Get.lazyPut(() => AdsController());
+  Get.lazyPut(() => AdsController(sp: Get.find()));
 
   Get.lazyPut(() => InAppPurchaseController(sp: Get.find()));
 }

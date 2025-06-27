@@ -22,6 +22,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
       appBar: AppBar(title: const Text("True or False?")),
       body: Obx(() {
         if (controller.isGameOver.value) {
+          Get.find<AdsController>().showInterstitialAd();
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

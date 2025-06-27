@@ -3,13 +3,10 @@ description: "A New Version of already uploeded application OMath puzzle app"
 
 publish_to: 'none' 
 
-#v1.2 = Game moved to Flutter
-#v1.3 = Game redesigned
-#v1.4 = Mathwize
-#v1.5 = two new game modes
 #v1.7 = inapp purchase and ads integration.
 #1.8 = New game mode true and false
-version: 1.8.0+8
+#1.9 = ads issue
+version: 1.9.0+9
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

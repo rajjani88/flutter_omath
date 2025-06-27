@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
@@ -40,6 +41,7 @@ class MathGridPuzzleController extends GetxController implements GetxService {
       },
       textConfirm: 'Play Again',
     );
+    Get.find<AdsController>().showInterstitialAd();
   }
 
   void _resetGame() {

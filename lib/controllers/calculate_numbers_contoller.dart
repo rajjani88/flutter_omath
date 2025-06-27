@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum OperationMode { auto, add, subtract, multiply, divide }
@@ -15,14 +14,18 @@ class CalculateNumbersController extends GetxController implements GetxService {
 
   Timer? _gameTimer;
 
+  final RxBool isGamOver = false.obs;
+
   void startGame(OperationMode selectedMode) {
     level.value = 1;
     mode.value = selectedMode;
+
     startTimer();
     generateQuestion();
   }
 
   void startTimer() {
+    isGamOver.value = false;
     timer.value = 30;
     _gameTimer?.cancel();
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -31,6 +34,7 @@ class CalculateNumbersController extends GetxController implements GetxService {
       } else {
         t.cancel();
         Get.snackbar("Time's up!", "Game over!");
+        isGamOver.value = true;
         resetGame();
       }
     });

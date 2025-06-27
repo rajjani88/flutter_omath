@@ -16,6 +16,8 @@ class ArrangeNumberController extends GetxController implements GetxService {
 
   final RxInt currentLevel = 1.obs;
 
+  final gameOver = false.obs;
+
   void generateNumbers(
     int count,
   ) {
@@ -108,6 +110,8 @@ class ArrangeNumberController extends GetxController implements GetxService {
       remainingTime.value = 30;
     }
 
+    gameOver.value = false;
+
     gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (remainingTime.value > 0) {
         remainingTime.value--;
@@ -127,6 +131,7 @@ class ArrangeNumberController extends GetxController implements GetxService {
   void onTimeOut() {
     Get.snackbar("Time's Up", "Try the level again!",
         backgroundColor: mRedColor, colorText: mWhitecolor);
+    gameOver.value = true;
     resetGame();
   }
 
