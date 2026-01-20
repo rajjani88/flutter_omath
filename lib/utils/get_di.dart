@@ -1,9 +1,11 @@
 import 'package:flutter_omath/controllers/ads_contoller.dart';
+import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/controllers/arrange_number_contoller.dart';
 import 'package:flutter_omath/controllers/calculate_numbers_contoller.dart';
 import 'package:flutter_omath/controllers/inpurchase_controller.dart';
 import 'package:flutter_omath/controllers/math_grid_puzzle_controller.dart';
 import 'package:flutter_omath/controllers/math_maze_controller.dart';
+import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,4 +35,8 @@ Future<void> init() async {
   Get.lazyPut(() => AdsController(sp: Get.find()));
 
   Get.lazyPut(() => InAppPurchaseController(sp: Get.find()));
+
+  Get.lazyPut(() => SoundController());
+
+  Get.lazyPut(() => DailyChallengeController(prefs: sharedPreferences));
 }

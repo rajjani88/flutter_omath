@@ -34,12 +34,27 @@ class MathGridPuzzleController extends GetxController implements GetxService {
   void _showGameOver() {
     Get.defaultDialog(
       title: 'Game Over',
-      content: Text('Your level: ${level.value}'),
+      titleStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      content: Text('Your level: ${level.value}',
+          style: const TextStyle(fontSize: 18)),
+      barrierDismissible: false, // Force user to choose
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.green,
+      cancelTextColor: Colors.red,
       onConfirm: () {
-        Get.back();
-        _resetGame();
+        Get.back(); // Close dialog
+        _resetGame(); // Dialog might handle close automatically? usually confirm needs manual close?
+        // Get.defaultDialog auto-close behavior depends on implementation.
+        // Standard Get.defaultDialog usually REQUIRES manual close in onConfirm if not using textConfirm alone?
+        // Actually usually onConfirm implies ACTION.
+        // Let's use standard pattern.
       },
       textConfirm: 'Play Again',
+      textCancel: 'Menu',
+      onCancel: () {
+        Get.back(); // Close Dialog
+        Get.back(); // Close Screen
+      },
     );
     Get.find<AdsController>().showInterstitialAd();
   }
@@ -62,13 +77,23 @@ class MathGridPuzzleController extends GetxController implements GetxService {
 
   void _generateAnswerOptions() {
     Set<int> options = {_correctAnswer};
-    List<int> nums = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    while (options.length < 9) {
-      //int wrong = _correctAnswer + _random.nextInt(20) - 10;
-      nums.shuffle();
-      int wrong = _correctAnswer + nums[0] - 10;
+    // Smart Fakes: Close numbers to confuse logic
+    // +/- 1, +/- 2, +/- 10, and some randoms
+    List<int> offsets = [-1, 1, -2, 2, -10, 10, -5, 5];
 
-      if (wrong != _correctAnswer && wrong > 0) {
+    // Fill with smart fakes first
+    for (int offset in offsets) {
+      int fake = _correctAnswer + offset;
+      if (fake > 0 && fake != _correctAnswer) {
+        options.add(fake);
+      }
+      if (options.length >= 9) break;
+    }
+
+    // Fill remaining with random range if needed
+    while (options.length < 9) {
+      int wrong = _correctAnswer + _random.nextInt(20) - 10;
+      if (wrong > 0 && wrong != _correctAnswer) {
         options.add(wrong);
       }
     }
@@ -78,13 +103,20 @@ class MathGridPuzzleController extends GetxController implements GetxService {
   void onAnswerSelected(int selected) {
     if (selected == _correctAnswer) {
       level.value++;
+      // Dynamic Timer Logic (Pressure)
+      // Level 1: ~30s, Level 10: ~20s, Level 20: ~10s
+      int newTime = max(10, 30 - level.value);
+      timeLeft.value = newTime;
     } else {
-      timeLeft.value -= 5;
-      Fluttertoast.showToast(msg: "This is wrong answer");
+      timeLeft.value = max(0, timeLeft.value - 5);
+      Fluttertoast.showToast(msg: "Wrong! -5s");
     }
 
     if (timeLeft.value > 0) {
       _generateNewQuestion();
+    } else {
+      _timer.cancel(); // Ensure timer stops if penalty killed it
+      _showGameOver();
     }
   }
 

@@ -1,10 +1,14 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/arrange_number_contoller.dart';
+import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/models/order_type.dart';
-import 'package:flutter_omath/utils/app_colors.dart';
-import 'package:flutter_omath/utils/consts.dart';
+import 'package:flutter_omath/utils/game_colors.dart';
+import 'package:flutter_omath/widgets/game_background.dart';
+import 'package:flutter_omath/widgets/game_button.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ArrangeNumber extends StatefulWidget {
   const ArrangeNumber({super.key});
@@ -14,13 +18,13 @@ class ArrangeNumber extends StatefulWidget {
 }
 
 class _ArrangeNumberState extends State<ArrangeNumber> {
-  ArrangeNumberController controller = Get.find();
+  final ArrangeNumberController controller = Get.find();
+  final SoundController soundController = Get.find<SoundController>();
+
   @override
   void initState() {
     super.initState();
-    controller.generateNumbers(
-      8,
-    );
+    controller.generateNumbers(8);
     controller.startTimer();
   }
 
@@ -32,195 +36,293 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: mAppBlue,
-      body: Obx(
-        () => controller.gameOver.value
-            ? buildGameOver()
-            : Column(
-                children: [
-                  const SizedBox(
-                    height: 56,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 14, right: 14),
-                    child: Row(
+    return GameBackground(
+      child: Stack(
+        children: [
+          Obx(
+            () => controller.gameOver.value
+                ? _buildGameOver()
+                : SingleChildScrollView(
+                    child: Column(
                       children: [
-                        Hero(
-                          tag: 'logo',
-                          child: Image.asset(
-                            imgNumber,
-                            height: 56,
-                            width: 56,
+                        const SizedBox(height: 10),
+                        // Custom Header
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              GameButton(
+                                text: "",
+                                icon: Icons.arrow_back_rounded,
+                                width: 50,
+                                height: 50,
+                                color: Colors.white.withOpacity(0.2),
+                                shadowColor: Colors.black.withOpacity(0.2),
+                                onTap: () => Get.back(),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  "Arrange Numbers",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.fredoka(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Obx(() => GameButton(
+                                    text: "",
+                                    icon: soundController.isMuted.value
+                                        ? Icons.volume_off
+                                        : Icons.volume_up,
+                                    width: 50,
+                                    height: 50,
+                                    color: Colors.white.withOpacity(0.2),
+                                    shadowColor: Colors.black.withOpacity(0.2),
+                                    onTap: () => soundController.toggleMute(),
+                                  )),
+                            ],
                           ),
                         ),
-                        const SizedBox(
-                          width: 16,
+
+                        const SizedBox(height: 20),
+
+                        // HUD
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildHUDChip(
+                                  "LEVEL",
+                                  "${controller.currentLevel.value}",
+                                  GameColors.secondary),
+                              _buildHUDChip(
+                                  "TIME",
+                                  "${controller.remainingTime.value}s",
+                                  GameColors.danger),
+                            ],
+                          ),
                         ),
-                        const Text(
-                          'Arrange Numbers',
-                          style: TextStyle(
-                              color: mWhitecolor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
+
+                        const SizedBox(height: 30),
+
+                        // Instruction Panel
+                        FadeInDown(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                  color: Colors.white.withOpacity(0.2)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Arrange in ",
+                                  style: GoogleFonts.nunito(
+                                      color: Colors.white70, fontSize: 16),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: controller.currentOrder.value ==
+                                            OrderType.asc
+                                        ? GameColors.success
+                                        : GameColors.primary,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    controller.currentOrder.value ==
+                                            OrderType.asc
+                                        ? "ASCENDING"
+                                        : "DESCENDING",
+                                    style: GoogleFonts.fredoka(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Text(
+                                  " order",
+                                  style: GoogleFonts.nunito(
+                                      color: Colors.white70, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(14),
-                    child: Divider(
-                      color: mWhitecolor,
-                    ),
-                  ),
-                  Obx(() => Text("Level: ${controller.currentLevel.value}",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: mWhitecolor))),
-                  const SizedBox(height: 20),
-                  Obx(() => Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Time Left: ",
-                              style:
-                                  TextStyle(fontSize: 14, color: mWhitecolor)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text("${controller.remainingTime.value}s",
-                              style: const TextStyle(
-                                  fontSize: 18,
-                                  color: mRedColor,
-                                  fontWeight: FontWeight.w800))
-                        ],
-                      )),
-                  // Show ASC/DSC
-                  Obx(() => Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Arrange the numbers in",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: mWhitecolor,
-                            ),
-                          ),
-                          Text(
-                            " ${controller.currentOrder.value == OrderType.asc ? "ASCENDING" : "DESCENDING"} ",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: mWhitecolor,
-                            ),
-                          ),
-                          Text(
-                            "order",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: mWhitecolor,
-                            ),
-                          ),
-                        ],
-                      )),
-                  const SizedBox(height: 20),
-                  // Center slots (empty boxes)
-                  Obx(() => Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: Center(
+
+                        const SizedBox(height: 30),
+
+                        // Center slots (Filled Slots)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: Wrap(
                             alignment: WrapAlignment.center,
-                            spacing: 10,
-                            runSpacing: 10,
+                            spacing: 12,
+                            runSpacing: 12,
                             children: controller.userSelection
                                 .map((number) => Container(
-                                      width: 60,
-                                      height: 60,
+                                      width: 65,
+                                      height: 65,
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: mWhitecolor, width: 2),
-                                        borderRadius: BorderRadius.circular(8),
                                         color: number != null
-                                            ? Colors.blue
-                                            : Colors.transparent,
+                                            ? GameColors.panel
+                                            : Colors.black.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                            color: number != null
+                                                ? GameColors.secondary
+                                                : Colors.white.withOpacity(0.3),
+                                            width: 2),
+                                        boxShadow: number != null
+                                            ? [
+                                                BoxShadow(
+                                                  color: GameColors.secondary
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 10,
+                                                  spreadRadius: 1,
+                                                )
+                                              ]
+                                            : null,
                                       ),
                                       child: Text(
                                         number?.toString() ?? '',
-                                        style: const TextStyle(
+                                        style: GoogleFonts.fredoka(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 18,
+                                          fontSize: 24,
                                         ),
                                       ),
                                     ))
                                 .toList(),
                           ),
                         ),
-                      )),
-                  const SizedBox(height: 20),
 
-                  // Number buttons (pool)
-                  Obx(() => Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: Center(
+                        const SizedBox(height: 40),
+
+                        // Number buttons (Pool)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: Wrap(
                             alignment: WrapAlignment.center,
-                            spacing: 10,
-                            runSpacing: 10,
+                            spacing: 12,
+                            runSpacing: 12,
                             children: controller.numberPool
-                                .map((num) => GestureDetector(
-                                      onTap: () => controller.selectNumber(num),
-                                      child: Container(
-                                        width: 60,
-                                        height: 60,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          num.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                .map((num) => FadeInUp(
+                                      child: GameButton(
+                                        text: num.toString(),
+                                        width: 65,
+                                        height: 65,
+                                        fontSize: 24,
+                                        color: GameColors.panel,
+                                        shadowColor:
+                                            Colors.black.withOpacity(0.3),
+                                        onTap: () =>
+                                            controller.selectNumber(num),
                                       ),
                                     ))
                                 .toList(),
                           ),
                         ),
-                      )),
-                  const SizedBox(height: 30),
-                ],
-              ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget buildGameOver() {
+  Widget _buildGameOver() {
     Get.find<AdsController>().showRewardedAd();
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: FadeInUp(
+        child: Container(
+          margin: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Time's Up!",
+                  style: GoogleFonts.fredoka(
+                      fontSize: 32, color: GameColors.danger)),
+              const SizedBox(height: 20),
+              Text("Score: ${controller.currentLevel}",
+                  style: GoogleFonts.nunito(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 30),
+              GameButton(
+                text: "Play Again",
+                onTap: () {
+                  controller.generateNumbers(8);
+                  controller.startTimer();
+                },
+                color: GameColors.success,
+                shadowColor: GameColors.successShadow,
+              ),
+              const SizedBox(height: 16),
+              GameButton(
+                text: "Menu",
+                onTap: () => Get.back(),
+                color: GameColors.secondary,
+                shadowColor: GameColors.secondaryShadow,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHUDChip(String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Row(
         children: [
-          const Text("⏱️ Time's up!", style: TextStyle(fontSize: 24)),
-          Text("Score: ${controller.currentLevel}",
-              style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              controller.generateNumbers(
-                8,
-              );
-              controller.startTimer();
-            },
-            child: const Text("Play Again"),
+          Text(
+            "$label: ",
+            style: GoogleFonts.fredoka(
+              fontSize: 12,
+              color: Colors.white.withOpacity(0.8),
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.fredoka(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ],
       ),

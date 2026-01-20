@@ -1,88 +1,76 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/commons/privacy_terms_row.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
-import 'package:flutter_omath/utils/app_colors.dart';
 import 'package:flutter_omath/utils/consts.dart';
+import 'package:flutter_omath/widgets/game_background.dart';
+import 'package:flutter_omath/widgets/game_button.dart';
+import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: mAppBlue,
-      body: Stack(
+    return GameBackground(
+      child: Stack(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Hero(
-                    tag: 'logo',
-                    child: Image.asset(
-                      imgLogoTr,
-                      height: 240,
-                      width: 240,
-                    ),
+          Center(
+            child: FadeInDown(
+              child: Hero(
+                tag: 'logo',
+                child: Container(
+                  decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                    BoxShadow(
+                        color: GameColors.primary.withOpacity(0.5),
+                        blurRadius: 40)
+                  ]),
+                  child: Image.asset(
+                    imgLogoTr,
+                    height: 240,
+                    width: 240,
                   ),
-                ],
+                ),
               ),
-            ],
+            ),
           ),
           Positioned(
-            bottom: 16,
-            left: 22,
-            right: 22,
+            bottom: 30,
+            left: 20,
+            right: 20,
             child: Column(
               children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Train Your Brain with Some Math.',
-                      style: TextStyle(
-                          color: mWhitecolor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600),
-                    )
-                  ],
+                FadeInUp(
+                  delay: const Duration(milliseconds: 200),
+                  child: Text(
+                    'Train Your Brain with Math',
+                    style: GoogleFonts.nunito(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600),
+                  ),
                 ),
-                const SizedBox(
-                  height: 14,
+                const SizedBox(height: 20),
+                FadeInUp(
+                  delay: const Duration(milliseconds: 400),
+                  child: GameButton(
+                    text: "Continue",
+                    color: Colors.white,
+                    textColor:
+                        GameColors.bgBottom, // Purple text on white button
+                    shadowColor: Colors.grey.shade400,
+                    fontSize: 22,
+                    onTap: () {
+                      Get.to(() => const HomeScreen());
+                    },
+                  ),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14))),
-                          onPressed: () {
-                            Get.to(() => const HomeScreen());
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.all(14.0),
-                            child: Text(
-                              'Continue',
-                              style: TextStyle(
-                                  color: mAppBlue,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          )),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 18,
-                ),
-                const PrivacyTermsRow(),
-                const SizedBox(
-                  height: 16,
-                ),
+                const SizedBox(height: 20),
+                FadeInUp(
+                    delay: const Duration(milliseconds: 600),
+                    child: const PrivacyTermsRow()),
               ],
             ),
           )

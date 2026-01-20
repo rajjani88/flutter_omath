@@ -46,15 +46,47 @@ class TrueFalseGameController extends GetxController {
 
   void generateQuestion() {
     final rng = Random();
-    int a = rng.nextInt(10) + 1;
-    int b = rng.nextInt(10) + 1;
-    int result = a * b;
+    int currentLevel = level.value;
+    int a, b, realResult;
+    String op;
+
+    // Difficulty Curve ("Flow Channel")
+    if (currentLevel <= 5) {
+      a = rng.nextInt(10) + 1;
+      b = rng.nextInt(10) + 1;
+      realResult = a + b;
+      op = "+";
+    } else if (currentLevel <= 10) {
+      a = rng.nextInt(20) + 5;
+      b = rng.nextInt(10) + 1;
+      realResult = a - b;
+      op = "-";
+    } else {
+      // High level: Multiplication
+      a = rng.nextInt(12) + 2;
+      b = rng.nextInt(10) + 2;
+      realResult = a * b;
+      op = "×";
+    }
 
     bool showCorrect = rng.nextBool();
-    int displayedResult = showCorrect ? result : result + rng.nextInt(5) - 2;
+    int displayedResult;
 
-    question.value = "$a × $b = $displayedResult";
-    isCorrectAnswer.value = (displayedResult == result);
+    if (showCorrect) {
+      displayedResult = realResult;
+    } else {
+      // Smart Logic: Ensure fake answer is NEVER equal to real answer
+      do {
+        int offset =
+            rng.nextInt(9) - 4; // Range -4 to +4 (excluding 0 via loop)
+        displayedResult = realResult + offset;
+      } while (displayedResult == realResult);
+    }
+
+    question.value = "$a $op $b = $displayedResult";
+
+    // Logic: Correct answer is True if displayed == real
+    isCorrectAnswer.value = (displayedResult == realResult);
   }
 
   void onAnswer(bool userSaysTrue) {
