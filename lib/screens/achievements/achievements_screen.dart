@@ -126,7 +126,7 @@ class AchievementsScreen extends StatelessWidget {
   Widget _buildAchievementCard(Achievement achievement) {
     final isUnlocked = achievement.isUnlocked.value;
     final progress = achievement.progress;
-    final isInProgress = !isUnlocked && progress > 0;
+    final hasProgress = progress > 0;
 
     return GlassCard(
       borderRadius: 20,
@@ -181,7 +181,7 @@ class AchievementsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isUnlocked ? achievement.name : "???",
+                  achievement.name,
                   style: GoogleFonts.quicksand(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -190,15 +190,15 @@ class AchievementsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isUnlocked ? achievement.description : "Hidden Achievement",
+                  achievement.description,
                   style: GoogleFonts.quicksand(
                     fontSize: 12,
                     color: isUnlocked ? Colors.white70 : Colors.white24,
                   ),
                 ),
 
-                // Progress Bar (if in progress)
-                if (isInProgress) ...[
+                // Progress Bar (if has progress)
+                if (hasProgress && !isUnlocked) ...[
                   const SizedBox(height: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

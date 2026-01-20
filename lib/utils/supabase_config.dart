@@ -11,8 +11,8 @@ class SupabaseConfig {
 
   // Avatar asset paths (based on avatar_id 0-4)
   static String getAvatarPath(int avatarId) {
-    // Clamp to valid range
-    final id = avatarId.clamp(0, 4);
+    // Clamp to valid range (0-25)
+    final id = avatarId.clamp(0, 25);
     return 'assets/avatars/$id.png';
   }
 

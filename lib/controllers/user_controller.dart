@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
+import 'package:flutter_omath/controllers/inpurchase_controller.dart';
+import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -261,7 +263,17 @@ class UserController extends GetxController {
 
   /// Update avatar
   Future<void> updateAvatar(int newAvatarId) async {
-    avatarId.value = newAvatarId.clamp(0, 4);
+    // Check for premium avatars (ID > 4)
+    if (newAvatarId > 4) {
+      final iapController = Get.find<InAppPurchaseController>();
+      if (!iapController.isPro.value) {
+        // Redirect to Go Pro screen if trying to select locked avatar
+        Get.to(() => const GoProScreen());
+        return;
+      }
+    }
+
+    avatarId.value = newAvatarId.clamp(0, 25);
     await _updateProfile({'avatar_id': avatarId.value});
   }
 

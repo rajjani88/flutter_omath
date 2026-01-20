@@ -8,6 +8,7 @@ import 'package:flutter_omath/widgets/glass_card.dart';
 import 'package:flutter_omath/widgets/juicy_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_omath/widgets/avatar_gallery_modal.dart';
 import 'package:flutter_omath/widgets/streak_components.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -202,48 +203,74 @@ class _ProfileScreenState extends State<ProfileScreen>
                         spacing: 16,
                         runSpacing: 16,
                         alignment: WrapAlignment.center,
-                        children: List.generate(5, (index) {
-                          return Obx(() {
-                            final isSelected =
-                                userController.avatarId.value == index;
-                            return GestureDetector(
-                              onTap: () => userController.updateAvatar(index),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isSelected
-                                      ? Colors.white.withOpacity(0.2)
-                                      : Colors.black.withOpacity(0.2),
-                                  border: isSelected
-                                      ? Border.all(
-                                          color: Colors.white, width: 2)
-                                      : null,
-                                  boxShadow: isSelected
-                                      ? [
-                                          BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.2),
-                                              blurRadius: 8)
-                                        ]
-                                      : [],
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    SupabaseConfig.getAvatarPath(index),
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(Icons.person,
-                                          color: Colors.white, size: 24);
-                                    },
+                        children: [
+                          // Top 5 Avatars
+                          ...List.generate(5, (index) {
+                            return Obx(() {
+                              final isSelected =
+                                  userController.avatarId.value == index;
+                              return GestureDetector(
+                                onTap: () => userController.updateAvatar(index),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isSelected
+                                        ? Colors.white.withOpacity(0.2)
+                                        : Colors.black.withOpacity(0.2),
+                                    border: isSelected
+                                        ? Border.all(
+                                            color: Colors.white, width: 2)
+                                        : null,
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.2),
+                                                blurRadius: 8)
+                                          ]
+                                        : [],
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      SupabaseConfig.getAvatarPath(index),
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(Icons.person,
+                                            color: Colors.white, size: 24);
+                                      },
+                                    ),
                                   ),
                                 ),
+                              );
+                            });
+                          }),
+
+                          // Plus Button
+                          GestureDetector(
+                            onTap: () => AvatarGalleryModal.show(context),
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.15),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 2,
+                                ),
                               ),
-                            );
-                          });
-                        }),
+                              child: const Icon(
+                                Icons.add_rounded,
+                                color: Colors.white70,
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
