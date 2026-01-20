@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/inpurchase_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -7,7 +8,12 @@ import 'package:flutter_omath/controllers/true_false_controller.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/game_button.dart';
+import 'package:flutter_omath/widgets/glass_back_button.dart';
+import 'package:flutter_omath/widgets/game_bottom_bar.dart';
+import 'package:flutter_omath/widgets/glass_icon_button.dart'; // Add this
 import 'package:get/get.dart';
+import 'package:flutter_omath/screens/home_screen/home_screen.dart';
+import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TrueFalseGame extends StatefulWidget {
@@ -39,35 +45,23 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   children: [
-                    GameButton(
-                      text: "",
-                      icon: Icons.arrow_back_rounded,
-                      width: 50,
-                      height: 50,
-                      color: Colors.white.withOpacity(0.2),
-                      shadowColor: Colors.black.withOpacity(0.2),
-                      onTap: () => Get.back(),
-                    ),
+                    const GlassBackButton(),
                     const SizedBox(width: 16),
                     Text(
                       "True or False",
                       style: GoogleFonts.fredoka(
-                        fontSize: 24,
+                        fontSize: 24.sp,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const Spacer(),
-                    Obx(() => GameButton(
-                          text: "",
-                          icon: soundController.isMuted.value
+                    Obx(() => GlassIconButton(
+                          icon: (!soundController.isSfxOn.value)
                               ? Icons.volume_off
                               : Icons.volume_up,
-                          width: 50,
-                          height: 50,
-                          color: Colors.white.withOpacity(0.2),
-                          shadowColor: Colors.black.withOpacity(0.2),
-                          onTap: () => soundController.toggleMute(),
+                          onTap: () => soundController
+                              .toggleSfx(!soundController.isSfxOn.value),
                         )),
                   ],
                 ),
@@ -75,7 +69,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
 
               const SizedBox(height: 20),
 
-              // HUD
+              // HUD with Coins
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Obx(() => Row(
@@ -83,8 +77,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                       children: [
                         _buildHUDChip("LEVEL", "${controller.level}",
                             GameColors.secondary),
-                        _buildHUDChip(
-                            "SCORE", "${controller.score}", GameColors.primary),
+                        const CoinDisplayWidget(),
                         _buildHUDChip(
                             "TIME", "${controller.timer}s", GameColors.danger),
                       ],
@@ -96,9 +89,9 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
               // Game Body or Game Over
               Expanded(
                 child: Obx(() {
-                  if (controller.isGameOver.value) {
-                    return _buildGameOver(controller);
-                  }
+                  // if (controller.isGameOver.value) {
+                  //   return _buildGameOver(controller);
+                  // }
 
                   return Column(
                     children: [
@@ -130,7 +123,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                             controller.question.value,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(
-                              fontSize: 42,
+                              fontSize: 42.sp,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                             ),
@@ -140,109 +133,82 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
 
                       const Spacer(flex: 2),
 
-                      // Answer Buttons
+                      // Answer Buttons with Hint support
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: FadeInLeft(
-                                child: GameButton(
-                                  text: "True",
-                                  icon: Icons.check,
-                                  color: GameColors.success,
-                                  shadowColor: GameColors.successShadow,
-                                  height: 80,
-                                  fontSize: 24,
-                                  onTap: () => controller.onAnswer(true),
+                        child: Obx(() => Row(
+                              children: [
+                                Expanded(
+                                  child: FadeInLeft(
+                                    child: GameButton(
+                                      text: "True",
+                                      icon: Icons.check,
+                                      // Highlight if hint active and True is correct
+                                      color: (controller.showHint.value &&
+                                              controller.isCorrectAnswer.value)
+                                          ? Colors.green.shade300
+                                          : GameColors.success,
+                                      shadowColor: GameColors.successShadow,
+                                      height: 80.h,
+                                      fontSize: 24.sp,
+                                      onTap: () => controller.onAnswer(true),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: FadeInRight(
-                                child: GameButton(
-                                  text: "False",
-                                  icon: Icons.close,
-                                  color: GameColors.danger,
-                                  shadowColor: GameColors.dangerShadow,
-                                  height: 80,
-                                  fontSize: 24,
-                                  onTap: () => controller.onAnswer(false),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: FadeInRight(
+                                    child: GameButton(
+                                      text: "False",
+                                      icon: Icons.close,
+                                      // Highlight if hint active and False is correct
+                                      color: (controller.showHint.value &&
+                                              !controller.isCorrectAnswer.value)
+                                          ? Colors.green.shade300
+                                          : GameColors.danger,
+                                      shadowColor: GameColors.dangerShadow,
+                                      height: 80.h,
+                                      fontSize: 24.sp,
+                                      onTap: () => controller.onAnswer(false),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
+                              ],
+                            )),
                       ),
-                      const SizedBox(height: 40),
+                      // Power-Up Bar
+                      GamePowerUpBar(
+                        onHint: () => controller.useHint(),
+                        onFreeze: () => controller.freezeTime(),
+                        onSkip: () => controller.skipLevel(),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   );
                 }),
               ),
             ],
           ),
+          Obx(() {
+            if (controller.isGameOver.value) {
+              return Positioned.fill(
+                child: GameResultPopup(
+                  score: controller.score.value,
+                  isTimeUp: true,
+                  onRetry: () {
+                    // Logic for retry
+                    if (!purchaseController.isPro.value) {
+                      adsController.showInterstitialAd();
+                    }
+                    controller.startGame();
+                  },
+                  onHome: () => Get.offAll(() => const HomeScreen()),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
         ],
-      ),
-    );
-  }
-
-  Widget _buildGameOver(TrueFalseGameController controller) {
-    // Show ad if appropriate (handled in original code build method start, but we do it here)
-    // The view logic originally had this check in the build body.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Avoid calling setState during build if ad calls triggers it
-      Get.find<AdsController>().showInterstitialAd();
-    });
-
-    return Center(
-      child: FadeInUp(
-        child: Container(
-          margin: const EdgeInsets.all(30),
-          padding: const EdgeInsets.all(30),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              )
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("Time's Up!",
-                  style: GoogleFonts.fredoka(
-                      fontSize: 32, color: GameColors.danger)),
-              const SizedBox(height: 20),
-              Text("Score: ${controller.score}",
-                  style: GoogleFonts.nunito(
-                      fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 30),
-              GameButton(
-                text: "Play Again",
-                onTap: () {
-                  if (!purchaseController.isPro.value) {
-                    adsController.showInterstitialAd();
-                  }
-                  controller.resetGame();
-                },
-                color: GameColors.success,
-                shadowColor: GameColors.successShadow,
-              ),
-              const SizedBox(height: 16),
-              GameButton(
-                text: "Menu",
-                onTap: () => Get.back(),
-                color: GameColors.secondary,
-                shadowColor: GameColors.secondaryShadow,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -265,14 +231,14 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
           Text(
             "$label: ",
             style: GoogleFonts.fredoka(
-              fontSize: 10,
+              fontSize: 10.sp,
               color: Colors.white.withOpacity(0.8),
             ),
           ),
           Text(
             value,
             style: GoogleFonts.fredoka(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

@@ -6,6 +6,7 @@ import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/game_button.dart';
+import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -34,15 +35,7 @@ class _GoProScreenState extends State<GoProScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
                       children: [
-                        GameButton(
-                          text: "",
-                          icon: Icons.arrow_back_rounded,
-                          width: 50,
-                          height: 50,
-                          color: Colors.white.withOpacity(0.2),
-                          shadowColor: Colors.black.withOpacity(0.2),
-                          onTap: () => Get.back(),
-                        ),
+                        GlassBackButton(onTap: () => Get.back()),
                         const SizedBox(width: 16),
                         Text(
                           "Go Pro!",

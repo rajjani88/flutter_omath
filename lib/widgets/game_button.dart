@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:get/get.dart';
@@ -64,6 +65,21 @@ class _GameButtonState extends State<GameButton>
 
   @override
   Widget build(BuildContext context) {
+    // Use .h for defaults if not provided, usually caller provides
+    // But since defaults are constants in constructor, we handle logic here or assume caller handles logic if passing explicit values
+    // To be safe, let's just apply .h/.sp to values used in build
+
+    // Actually, defaults in constructor are raw double.
+    // Best practice: keep constructor defaults raw, apply .h/.sp in build OR apply to default values if possible (but params are const)
+
+    final h = widget.height == 60
+        ? 60.h
+        : widget.height; // Logic: if default, scale it.
+    final fs = widget.fontSize == 20
+        ? 20.sp
+        : widget.fontSize; // if default 20, scale it.
+    final w = widget.width;
+
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) {
@@ -78,36 +94,39 @@ class _GameButtonState extends State<GameButton>
           return Transform.scale(
             scale: _scaleAnimation.value,
             child: Container(
-              width: widget.width,
-              height: widget.height,
+              width: w,
+              height: h,
               decoration: BoxDecoration(
                 color: widget.color,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
                     color: widget.shadowColor,
-                    offset: const Offset(0, 6),
+                    offset: Offset(0, 6.h),
                     blurRadius: 0,
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (widget.icon != null) ...[
-                    Icon(widget.icon,
-                        color: widget.textColor ?? Colors.white, size: 28),
-                    const SizedBox(width: 10),
-                  ],
-                  Text(
-                    widget.text,
-                    style: GoogleFonts.fredoka(
-                      fontSize: widget.fontSize,
-                      fontWeight: FontWeight.bold,
-                      color: widget.textColor ?? Colors.white,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min, // shrink to fit
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon,
+                          color: widget.textColor ?? Colors.white, size: 28.sp),
+                      SizedBox(width: 10.w),
+                    ],
+                    Text(
+                      widget.text,
+                      style: GoogleFonts.rubik(
+                        fontSize: fs,
+                        fontWeight: FontWeight.bold,
+                        color: widget.textColor ?? Colors.white,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

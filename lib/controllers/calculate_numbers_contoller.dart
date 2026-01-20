@@ -1,7 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/achievement_controller.dart';
+import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
+import 'package:flutter_omath/controllers/sound_controller.dart';
+import 'package:flutter_omath/controllers/user_controller.dart';
+import 'package:flutter_omath/utils/consts.dart';
+import 'package:flutter_omath/utils/supabase_config.dart';
+import 'package:flutter_omath/widgets/daily_challenge_success_popup.dart';
+import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:get/get.dart';
 
 enum OperationMode { auto, add, subtract, multiply, divide }
@@ -23,7 +31,11 @@ class CalculateNumbersController extends GetxController implements GetxService {
 
   Timer? _gameTimer;
 
-  final RxBool isGamOver = false.obs;
+  final RxBool isGameOver = false.obs;
+
+  // Power-Up States
+  final RxBool isTimeFrozen = false.obs;
+  Timer? _freezeTimer;
 
   void startGame(OperationMode selectedMode,
       {int? seed, bool isDaily = false}) {
@@ -42,7 +54,7 @@ class CalculateNumbersController extends GetxController implements GetxService {
   }
 
   void startTimer() {
-    isGamOver.value = false;
+    isGameOver.value = false;
     _startTimerForLevel();
   }
 
@@ -53,12 +65,15 @@ class CalculateNumbersController extends GetxController implements GetxService {
     timer.value = timeForLevel;
 
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      // Don't decrement if frozen
+      if (isTimeFrozen.value) return;
+
       if (timer.value > 0) {
         timer.value--;
       } else {
         t.cancel();
-        isGamOver.value = true;
-        // Don't call resetGame immediately, let view handle Game Over UI
+        isGameOver.value = true;
+        Get.find<SoundController>().playWrong();
       }
     });
   }
@@ -140,22 +155,15 @@ class CalculateNumbersController extends GetxController implements GetxService {
       // Daily Challenge Win Condition
       if (isDailyChallenge && level.value > dailyChallengeTargetLevel) {
         Get.find<DailyChallengeController>().completeChallenge();
+
+        if (isClosed) return;
         Get.dialog(
-          // Simple Dialog for Daily Challenge Win
           GetBuilder<DailyChallengeController>(builder: (dc) {
-            return AlertDialog(
-              title: const Text("🎉 Daily Challenge Complete!"),
-              content: Text(
-                  "You kept your streak alive!\nCurrent Streak: ${dc.currentStreak.value}"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Get.back(); // close dialog
-                    Get.back(); // close game
-                  },
-                  child: const Text("Awesome!"),
-                )
-              ],
+            return DailyChallengeSuccessPopup(
+              streak: dc.currentStreak.value,
+              onContinue: () {
+                Get.offAll(() => const HomeScreen());
+              },
             );
           }),
           barrierDismissible: false,
@@ -163,10 +171,18 @@ class CalculateNumbersController extends GetxController implements GetxService {
         return;
       }
 
-      // Get.snackbar("Correct!", "Level ${level.value}"); // Too noisy
+      // Award coins for correct answer
+      Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+      Get.find<SoundController>().playSuccess();
+
+      // Future Integrations
+      _updateLeaderboard();
+      _checkAchievements();
+
       _startTimerForLevel(); // Reset timer for new level
       generateQuestion();
     } else {
+      Get.find<SoundController>().playWrong();
       Get.snackbar("Wrong Answer", "Try again!");
     }
     resetInput();
@@ -181,9 +197,61 @@ class CalculateNumbersController extends GetxController implements GetxService {
     correctAnswer.value = 0;
   }
 
+  // ===== POWER-UP METHODS =====
+
+  /// Freeze Time Power-Up: Pauses timer for 10 seconds
+  void freezeTime() {
+    if (isTimeFrozen.value) return; // Already frozen
+
+    isTimeFrozen.value = true;
+    Get.snackbar("❄️ Time Frozen!", "10 seconds of peace...",
+        snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 2));
+
+    _freezeTimer?.cancel();
+    _freezeTimer = Timer(const Duration(seconds: kFreezeDuration), () {
+      isTimeFrozen.value = false;
+      Get.snackbar("⏱️ Time Resumed!", "Back to action!",
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 1));
+    });
+  }
+
+  /// Skip Level Power-Up: Auto-advance to next question
+  void skipLevel() {
+    level.value++;
+    _startTimerForLevel();
+    generateQuestion();
+    Get.snackbar("⏭️ Skipped!", "Moving to Level ${level.value}",
+        snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 1));
+  }
+
   @override
   void onClose() {
     _gameTimer?.cancel();
+    _freezeTimer?.cancel();
     super.onClose();
+  }
+
+  // ===== FUTURE INTEGRATION HOOKS =====
+
+  /// Update XP on Supabase leaderboard
+  void _updateLeaderboard() {
+    try {
+      Get.find<UserController>().addXp(SupabaseConfig.xpPerCorrectAnswer);
+    } catch (e) {
+      // UserController not initialized yet
+    }
+  }
+
+  /// Trigger achievement checks
+  void _checkAchievements() {
+    try {
+      final ac = Get.find<AchievementController>();
+      ac.checkEvents('correct_answer', null);
+      ac.checkEvents('game_played', null);
+      ac.checkEvents('coins_earned', null);
+    } catch (e) {
+      // AchievementController not initialized yet
+    }
   }
 }

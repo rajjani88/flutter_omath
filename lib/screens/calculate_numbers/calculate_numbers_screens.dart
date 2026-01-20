@@ -1,13 +1,20 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/calculate_numbers_contoller.dart';
+import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
+import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/game_button.dart';
+import 'package:flutter_omath/widgets/glass_back_button.dart';
+import 'package:flutter_omath/widgets/power_up_button.dart';
+import 'package:flutter_omath/widgets/glass_icon_button.dart'; // Add this
 import 'package:get/get.dart';
+import 'package:flutter_omath/widgets/game_result_popup.dart';
+import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CalculateNumbersScreen extends StatefulWidget {
@@ -29,7 +36,9 @@ class CalculateNumbersScreen extends StatefulWidget {
 class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
   final controller = Get.find<CalculateNumbersController>();
   final soundController = Get.find<SoundController>();
+  final currencyController = Get.find<CurrencyController>();
   late ConfettiController _confettiController;
+  Worker? _levelWorker;
 
   @override
   void initState() {
@@ -40,10 +49,11 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
         ConfettiController(duration: const Duration(seconds: 2));
 
     // Listen for level changes to trigger confetti
-    ever(controller.level, (_) {
+    _levelWorker = ever(controller.level, (_) {
       // Simple check: if level increases, it meant a success (roughly).
       // Ideally controller should emit a 'success' event, but this works for now.
-      if (controller.level.value > 1) {
+      // Ensure we don't trigger if widget is disposed (extra safety)
+      if (mounted && controller.level.value > 1) {
         _playSuccess();
       }
     });
@@ -51,11 +61,14 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
 
   void _playSuccess() {
     soundController.playSuccess();
-    _confettiController.play();
+    if (mounted) {
+      _confettiController.play();
+    }
   }
 
   @override
   void dispose() {
+    _levelWorker?.dispose();
     _confettiController.dispose();
     super.dispose();
   }
@@ -73,15 +86,7 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   children: [
-                    GameButton(
-                      text: "",
-                      icon: Icons.arrow_back_rounded,
-                      width: 50,
-                      height: 50,
-                      color: Colors.white.withOpacity(0.2),
-                      shadowColor: Colors.black.withOpacity(0.2),
-                      onTap: () => Get.back(),
-                    ),
+                    const GlassBackButton(),
                     const SizedBox(width: 16),
                     Text(
                       "Calculate",
@@ -93,16 +98,13 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
                     ),
                     const Spacer(),
                     // Mute Button
-                    Obx(() => GameButton(
-                          text: "",
-                          icon: soundController.isMuted.value
+                    // Mute Button
+                    Obx(() => GlassIconButton(
+                          icon: (!soundController.isSfxOn.value)
                               ? Icons.volume_off
                               : Icons.volume_up,
-                          width: 50,
-                          height: 50,
-                          color: Colors.white.withOpacity(0.2),
-                          shadowColor: Colors.black.withOpacity(0.2),
-                          onTap: () => soundController.toggleMute(),
+                          onTap: () => soundController
+                              .toggleSfx(!soundController.isSfxOn.value),
                         )),
                   ],
                 ),
@@ -110,7 +112,7 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
 
               const SizedBox(height: 20),
 
-              // HUD (Level & Time)
+              // HUD (Level, Time & Coins)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -118,114 +120,112 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
                   children: [
                     _buildHUDChip(
                         "LEVEL", controller.level, GameColors.secondary),
+                    _buildCoinHUD(),
                     _buildHUDChip("TIME", controller.timer, GameColors.danger),
                   ],
                 ),
               ),
 
               Expanded(
-                child: Obx(() {
-                  if (controller.isGamOver.value) {
-                    return _buildGameOver();
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Column(
-                      children: [
-                        // Question Board Area (Top ~40%)
-                        Expanded(
-                          flex: 4,
-                          child: Center(
-                            child: FadeInDown(
-                              from: 30,
-                              child: AspectRatio(
-                                aspectRatio:
-                                    1.5, // Keep board somewhat rectangular
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    color: GameColors.panel,
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(
-                                        color: Colors.white.withOpacity(0.1),
-                                        width: 2),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
-                                        offset: const Offset(0, 10),
-                                        blurRadius: 20,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    children: [
+                      // Question Board Area (Top ~40%)
+                      Expanded(
+                        flex: 4,
+                        child: Center(
+                          child: FadeInDown(
+                            from: 30,
+                            child: AspectRatio(
+                              aspectRatio:
+                                  1.5, // Keep board somewhat rectangular
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: GameColors.panel,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                      color: Colors.white.withOpacity(0.1),
+                                      width: 2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      offset: const Offset(0, 10),
+                                      blurRadius: 20,
+                                    ),
+                                  ],
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Obx(() => Text(
+                                            controller.question.value,
+                                            style: GoogleFonts.nunito(
+                                              fontSize: 56.sp, // Larger text
+                                              fontWeight: FontWeight.w900,
+                                              color: Colors.white,
+                                            ),
+                                          )),
+                                      const SizedBox(height: 20),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 30),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.3),
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: Obx(() => Text(
+                                              controller
+                                                      .userAnswer.value.isEmpty
+                                                  ? "?"
+                                                  : controller.userAnswer.value,
+                                              style: GoogleFonts.fredoka(
+                                                fontSize: 42,
+                                                color: GameColors.primary,
+                                                letterSpacing: 2,
+                                              ),
+                                            )),
                                       ),
                                     ],
-                                  ),
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          controller.question.value,
-                                          style: GoogleFonts.nunito(
-                                            fontSize: 56, // Larger text
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 30),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.3),
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: Text(
-                                            controller.userAnswer.value.isEmpty
-                                                ? "?"
-                                                : controller.userAnswer.value,
-                                            style: GoogleFonts.fredoka(
-                                              fontSize: 42,
-                                              color: GameColors.primary,
-                                              letterSpacing: 2,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                        // Numpad Area (Bottom ~60%)
-                        Expanded(
-                          flex: 6,
-                          child: FadeInUp(
-                            duration: const Duration(milliseconds: 600),
-                            child: Column(
-                              children: [
-                                _buildFlexRow(["1", "2", "3"], controller),
-                                _buildFlexRow(["4", "5", "6"], controller),
-                                _buildFlexRow(["7", "8", "9"], controller),
-                                _buildFlexRow(["C", "0", "OK"], controller),
-                              ],
-                            ),
+                      // Numpad Area (Bottom ~60%)
+                      Expanded(
+                        flex: 6,
+                        child: FadeInUp(
+                          duration: const Duration(milliseconds: 600),
+                          child: Column(
+                            children: [
+                              _buildFlexRow(["1", "2", "3"], controller),
+                              _buildFlexRow(["4", "5", "6"], controller),
+                              _buildFlexRow(["7", "8", "9"], controller),
+                              _buildFlexRow(["C", "0", "OK"], controller),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                  );
-                }),
+                      ),
+
+                      // Power-Up Bar
+                      _buildPowerUpBar(),
+
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -244,6 +244,19 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
                 GameColors.success,
               ],
             ),
+          ),
+          Obx(
+            () => controller.isGameOver.value
+                ? GameResultPopup(
+                    score: controller.level.value,
+                    onRetry: () {
+                      controller.startGame(controller.mode.value);
+                    },
+                    onHome: () {
+                      Get.offAll(() => const HomeScreen());
+                    },
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
@@ -328,7 +341,7 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
               Text(
                 "${valueObx.value}",
                 style: GoogleFonts.fredoka(
-                  fontSize: 20,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -338,51 +351,74 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
         ));
   }
 
-  Widget _buildGameOver() {
-    Get.find<AdsController>().showRewardedAd();
-    return Center(
-      child: FadeInDown(
-        child: Container(
-          margin: const EdgeInsets.all(30),
-          padding: const EdgeInsets.all(30),
+  Widget _buildCoinHUD() {
+    return Obx(() => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.amber.shade700,
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                offset: const Offset(0, 4),
               )
             ],
           ),
-          child: Column(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Time's Up!",
-                  style: GoogleFonts.fredoka(
-                      fontSize: 32, color: GameColors.danger)),
-              const SizedBox(height: 20),
-              Text("Score: ${controller.level}",
-                  style: GoogleFonts.nunito(
-                      fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 30),
-              GameButton(
-                text: "Play Again",
-                onTap: () => controller.startGame(OperationMode.auto),
-                color: GameColors.success,
-                shadowColor: GameColors.successShadow,
-              ),
-              const SizedBox(height: 16),
-              GameButton(
-                text: "Menu",
-                onTap: () => Get.back(),
-                color: GameColors.secondary,
-                shadowColor: GameColors.secondaryShadow,
+              const Text("🪙", style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 6),
+              Text(
+                "${currencyController.coinBalance.value}",
+                style: GoogleFonts.fredoka(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
-        ),
+        ));
+  }
+
+  Widget _buildPowerUpBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Freeze Time
+          PowerUpButton(
+            icon: Icons.ac_unit,
+            label: "Freeze",
+            cost: kFreezeCost,
+            color: Colors.cyan,
+            onActivate: () => controller.freezeTime(),
+          ),
+          // Skip Level
+          PowerUpButton(
+            icon: Icons.skip_next,
+            label: "Skip",
+            cost: kSkipCost,
+            color: GameColors.secondary,
+            onActivate: () => controller.skipLevel(),
+          ),
+          // Hint (placeholder for now)
+          PowerUpButton(
+            icon: Icons.lightbulb,
+            label: "Hint",
+            cost: kHintCost,
+            color: Colors.orange,
+            onActivate: () {
+              // For Calculate, hint could show first digit?
+              Get.snackbar("💡 Hint",
+                  "Answer starts with: ${controller.correctAnswer.value.toString()[0]}",
+                  snackPosition: SnackPosition.TOP,
+                  duration: const Duration(seconds: 3));
+            },
+          ),
+        ],
       ),
     );
   }

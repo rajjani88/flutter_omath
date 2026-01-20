@@ -1,96 +1,109 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
+import 'package:flutter_omath/controllers/achievement_controller.dart';
+import 'package:flutter_omath/controllers/currency_controller.dart';
+import 'package:flutter_omath/controllers/sound_controller.dart';
+import 'package:flutter_omath/controllers/user_controller.dart';
+
+import 'package:flutter_omath/utils/consts.dart';
+import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
-class MathGridPuzzleController extends GetxController implements GetxService {
-  RxInt level = 1.obs;
-  RxInt timeLeft = 30.obs;
-  RxString currentQuestion = ''.obs;
-  RxList<int> answerOptions = <int>[].obs;
+class MathGridPuzzleController extends GetxController {
+  final level = 1.obs;
+  final question = ''.obs;
+  final answerOptions = <int>[].obs;
+  final timeLeft = 30.obs;
+  final isGameOver = false.obs;
+
+  final _random = Random();
+  late int _correctAnswer;
   late Timer _timer;
-  int _correctAnswer = 0;
-  final Random _random = Random();
+  Timer? _freezeTimer;
+
+  // Power-Up States
+  RxBool isTimeFrozen = false.obs;
+  RxInt highlightedAnswer = (-1).obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    startGame();
+  }
 
   void startGame() {
+    level.value = 1;
     timeLeft.value = 30;
+    isGameOver.value = false;
     _generateNewQuestion();
     _startTimer();
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (timeLeft.value <= 0) {
-        timer.cancel();
-        _showGameOver();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      // Don't decrement if frozen
+      if (isTimeFrozen.value) return;
+
+      if (timeLeft.value == 0) {
+        t.cancel();
+        isGameOver.value = true;
+        Get.find<SoundController>().playWrong();
       } else {
         timeLeft.value--;
       }
     });
   }
 
-  void _showGameOver() {
-    Get.defaultDialog(
-      title: 'Game Over',
-      titleStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      content: Text('Your level: ${level.value}',
-          style: const TextStyle(fontSize: 18)),
-      barrierDismissible: false, // Force user to choose
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.green,
-      cancelTextColor: Colors.red,
-      onConfirm: () {
-        Get.back(); // Close dialog
-        _resetGame(); // Dialog might handle close automatically? usually confirm needs manual close?
-        // Get.defaultDialog auto-close behavior depends on implementation.
-        // Standard Get.defaultDialog usually REQUIRES manual close in onConfirm if not using textConfirm alone?
-        // Actually usually onConfirm implies ACTION.
-        // Let's use standard pattern.
-      },
-      textConfirm: 'Play Again',
-      textCancel: 'Menu',
-      onCancel: () {
-        Get.back(); // Close Dialog
-        Get.back(); // Close Screen
-      },
-    );
-    Get.find<AdsController>().showInterstitialAd();
-  }
-
-  void _resetGame() {
-    level.value = 1;
-    timeLeft.value = 30;
-    startGame();
+  @override
+  void onClose() {
+    _timer.cancel();
+    _freezeTimer?.cancel();
+    super.onClose();
   }
 
   void _generateNewQuestion() {
-    int a = _random.nextInt(50) + 1;
-    int b = _random.nextInt(50) + 1;
+    highlightedAnswer.value = -1;
 
-    _correctAnswer = a + b;
-    currentQuestion.value = "$a + $b = ?";
+    int a, b;
+    String op;
+    int scaleFactor = min(5, (level.value / 3).floor() + 1);
 
-    _generateAnswerOptions();
-  }
+    int opType = _random.nextInt(3);
+    switch (opType) {
+      case 0:
+        a = _random.nextInt(10 * scaleFactor) + 1;
+        b = _random.nextInt(10 * scaleFactor) + 1;
+        op = '+';
+        _correctAnswer = a + b;
+        break;
+      case 1:
+        a = _random.nextInt(15 * scaleFactor) + 10;
+        b = _random.nextInt(a);
+        op = '-';
+        _correctAnswer = a - b;
+        break;
+      default:
+        a = _random.nextInt(8) + 2;
+        b = _random.nextInt(8) + 2;
+        op = '×';
+        _correctAnswer = a * b;
+    }
 
-  void _generateAnswerOptions() {
+    question.value = "$a $op $b = ?";
+
+    // Smart Fake Answers
     Set<int> options = {_correctAnswer};
-    // Smart Fakes: Close numbers to confuse logic
-    // +/- 1, +/- 2, +/- 10, and some randoms
-    List<int> offsets = [-1, 1, -2, 2, -10, 10, -5, 5];
-
-    // Fill with smart fakes first
-    for (int offset in offsets) {
-      int fake = _correctAnswer + offset;
-      if (fake > 0 && fake != _correctAnswer) {
-        options.add(fake);
+    List<int> offsets = [-10, -2, -1, 1, 2, 10];
+    for (var offset in offsets) {
+      int fakeAnswer = _correctAnswer + offset;
+      if (fakeAnswer > 0 && fakeAnswer != _correctAnswer) {
+        options.add(fakeAnswer);
       }
       if (options.length >= 9) break;
     }
 
-    // Fill remaining with random range if needed
     while (options.length < 9) {
       int wrong = _correctAnswer + _random.nextInt(20) - 10;
       if (wrong > 0 && wrong != _correctAnswer) {
@@ -103,30 +116,80 @@ class MathGridPuzzleController extends GetxController implements GetxService {
   void onAnswerSelected(int selected) {
     if (selected == _correctAnswer) {
       level.value++;
-      // Dynamic Timer Logic (Pressure)
-      // Level 1: ~30s, Level 10: ~20s, Level 20: ~10s
+      Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+      Get.find<SoundController>().playSuccess();
       int newTime = max(10, 30 - level.value);
       timeLeft.value = newTime;
+
+      _updateLeaderboard();
+      _checkAchievements();
     } else {
       timeLeft.value = max(0, timeLeft.value - 5);
+      Get.find<SoundController>().playWrong();
       Fluttertoast.showToast(msg: "Wrong! -5s");
     }
 
     if (timeLeft.value > 0) {
       _generateNewQuestion();
     } else {
-      _timer.cancel(); // Ensure timer stops if penalty killed it
-      _showGameOver();
+      _timer.cancel();
+      isGameOver.value = true;
+      Get.find<SoundController>().playWrong();
     }
   }
 
-  void gameDispose() {
-    _timer.cancel();
+  // ===== POWER-UP METHODS =====
+
+  void useHint() {
+    highlightedAnswer.value = _correctAnswer;
+    Future.delayed(const Duration(seconds: 1), () {
+      highlightedAnswer.value = -1;
+    });
   }
 
-  @override
-  void onClose() {
-    _timer.cancel();
-    super.onClose();
+  void freezeTime() {
+    if (isTimeFrozen.value) return;
+
+    isTimeFrozen.value = true;
+    Get.snackbar("❄️ Time Frozen!", "10 seconds of peace...",
+        snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 2));
+
+    _freezeTimer?.cancel();
+    _freezeTimer = Timer(const Duration(seconds: kFreezeDuration), () {
+      isTimeFrozen.value = false;
+      Get.snackbar("⏱️ Time Resumed!", "Back to action!",
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 1));
+    });
+  }
+
+  void skipLevel() {
+    level.value++;
+    int newTime = max(10, 30 - level.value);
+    timeLeft.value = newTime;
+    _generateNewQuestion();
+    Get.snackbar("⏭️ Skipped!", "Moving to Level ${level.value}",
+        snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 1));
+  }
+
+  // ===== FUTURE INTEGRATION HOOKS =====
+
+  void _updateLeaderboard() {
+    try {
+      Get.find<UserController>().addXp(SupabaseConfig.xpPerCorrectAnswer);
+    } catch (e) {
+      // Not initialized
+    }
+  }
+
+  void _checkAchievements() {
+    try {
+      final ac = Get.find<AchievementController>();
+      ac.checkEvents('correct_answer', null);
+      ac.checkEvents('game_played', null);
+      ac.checkEvents('coins_earned', null);
+    } catch (e) {
+      // Not initialized
+    }
   }
 }

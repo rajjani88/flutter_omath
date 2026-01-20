@@ -1,6 +1,7 @@
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_omath/controllers/sound_controller.dart';
 
 class AdsController extends GetxController implements GetxService {
   // Ad instances
@@ -127,7 +128,7 @@ class AdsController extends GetxController implements GetxService {
     )..load();
   }
 
-  // Load Interstitial Ad
+// Load Interstitial Ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
       adUnitId: interstitialAdUnitId,
@@ -141,10 +142,13 @@ class AdsController extends GetxController implements GetxService {
           interstitialAd?.setImmersiveMode(true);
           interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (_) {
+              Get.find<SoundController>().resumeAudioAfterAd(); // Resume audio
               interstitialAd?.dispose();
               _loadInterstitialAd(); // Preload next interstitial ad
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
+              Get.find<SoundController>()
+                  .resumeAudioAfterAd(); // Resume if failed
               ad.dispose();
               _loadInterstitialAd(); // Preload next interstitial ad
             },
@@ -171,10 +175,13 @@ class AdsController extends GetxController implements GetxService {
           // Handle Ad events
           rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (_) {
+              Get.find<SoundController>().resumeAudioAfterAd(); // Resume audio
               rewardedAd?.dispose();
               _loadRewardedAd(); // Preload next rewarded ad
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
+              Get.find<SoundController>()
+                  .resumeAudioAfterAd(); // Resume if failed
               ad.dispose();
               _loadRewardedAd(); // Preload next rewarded ad
             },
@@ -194,6 +201,7 @@ class AdsController extends GetxController implements GetxService {
       return;
     }
     if (isInterstitialAdLoaded.value) {
+      Get.find<SoundController>().stopAudioForAd(); // Stop audio before show
       interstitialAd?.show();
       isInterstitialAdLoaded.value = false;
       totalAdsShown.value++;
@@ -208,6 +216,7 @@ class AdsController extends GetxController implements GetxService {
       return;
     }
     if (isRewardedAdLoaded.value) {
+      Get.find<SoundController>().stopAudioForAd(); // Stop audio before show
       rewardedAd?.show(
         onUserEarnedReward: (ad, reward) {
           coinsEarnedFromAds.value += reward.amount.toInt();
