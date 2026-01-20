@@ -184,7 +184,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            "${widget.score}",
+                            "⭐ ${widget.score}",
                             style: GoogleFonts.quicksand(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
