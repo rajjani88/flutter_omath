@@ -6,7 +6,8 @@ publish_to: 'none'
 #v1.7 = inapp purchase and ads integration.
 #1.8 = New game mode true and false
 #1.9 = ads issue
-version: 1.9.0+9
+#1.10 = bug fixes and performance improvement, ads removed
+version: 1.10.0+10
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
