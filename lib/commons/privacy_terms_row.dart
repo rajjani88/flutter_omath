@@ -17,7 +17,11 @@ class PrivacyTermsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      runSpacing: 4,
       children: [
         TextButton(
           onPressed: () {
@@ -31,10 +35,8 @@ class PrivacyTermsRow extends StatelessWidget {
                 fontWeight: FontWeight.w600),
           ),
         ),
-        const Spacer(),
-        Visibility(
-          visible: showRestore,
-          child: TextButton(
+        if (showRestore)
+          TextButton(
             onPressed: onRestoreClick,
             child: const Text(
               'Restore',
@@ -44,8 +46,6 @@ class PrivacyTermsRow extends StatelessWidget {
                   fontWeight: FontWeight.w600),
             ),
           ),
-        ),
-        const Spacer(),
         TextButton(
           onPressed: () {
             _launchUrl(urlTerms);

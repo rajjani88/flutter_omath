@@ -24,6 +24,13 @@ dependencies:
   in_app_purchase: ^3.2.3
   google_mobile_ads: ^6.0.0
   shared_preferences: ^2.5.3
+  audioplayers: ^6.1.0
+  confetti: ^0.8.0
+  google_fonts: ^7.0.2
+  animate_do: ^4.2.0
+  supabase_flutter: ^2.8.4
+  share_plus: ^10.1.4
+  flutter_screenutil: ^5.9.3
  
 
 dev_dependencies:
@@ -37,6 +44,8 @@ flutter:
   uses-material-design: true
   assets:
       - assets/images/
+      - assets/sounds/
+      - assets/avatars/
     
   
   
