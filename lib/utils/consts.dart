@@ -18,9 +18,9 @@ class AppConfig {
   static const String baseImgPath = 'assets/images';
 
   // --- ECONOMY ---
-  static const int startingCoins = 100;
+  static const int startingCoins = 40;
   static const int coinsPerWin = 20;
-  static const int coinsFromAd = 100;
+  static const int coinsFromAd = 10;
   static const int shareRewardCoins = 50;
 
   // --- POWER-UPS ---
@@ -47,6 +47,7 @@ class AppConfig {
       "ca-app-pub-3940256099942544/5224354917"; // Test ID
   static const String rewardedAdUnitIdIos =
       "ca-app-pub-3940256099942544/1712485313"; // Test ID
+
   static const String imgLogo = "assets/images/logo.png";
   static const String imgLogoTr = "assets/images/logo_tr.png"; // Fixed path
   static const String imgNumber = "assets/images/number.png";

@@ -27,8 +27,7 @@ import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_omath/widgets/streak_components.dart';
-// calculate_numbers_screens.dart is likely already imported or needed
-import 'package:flutter_omath/screens/calculate_numbers/calculate_numbers_screens.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // --- Main Screen ---
 
@@ -123,8 +122,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Solve the equation",
         "color": const Color(0xFFf472b6), // Hot Pink
         "icon": Icons.calculate,
-        "onTap": () => Get.to(
-            () => CalculateNumbersScreen(selectedMode: OperationMode.auto))
+        "onTap": () => Get.to(() =>
+            const CalculateNumbersScreen(selectedMode: OperationMode.auto))
       },
       {
         "title": "Math Maze",
@@ -165,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Colors.white.withOpacity(0.05),
+                    Colors.white.withAlpha(25),
                     Colors.transparent,
                   ],
                 ),
@@ -214,8 +213,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   "Premium Learning",
                                   style: GoogleFonts.quicksand(
                                     fontSize: 12.sp,
-                                    color: const Color(0xFFE9D5FF)
-                                        .withOpacity(0.6),
+                                    color: const Color(0xFFE9D5FF),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -250,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             boxShadow: [
                                               BoxShadow(
                                                   color: Colors.amber
-                                                      .withOpacity(0.4),
+                                                      .withAlpha(25),
                                                   blurRadius: 4)
                                             ]),
                                         child: const Text("💲",
@@ -307,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ],
                         ),
 
-                        SizedBox(height: 30.h),
+                        SizedBox(height: 12.h),
 
                         // --- Daily Streak Section ---
                         // DailyStreakCard(userController: userController),
@@ -318,15 +316,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               isCompleted:
                                   dailyController.isTodayCompleted.value,
                               onPlay: () {
-                                int seed = dailyController.getDailySeed();
-                                Get.to(() => CalculateNumbersScreen(
-                                    selectedMode: OperationMode.auto,
-                                    isDailyChallenge: true,
-                                    dailySeed: seed));
+                                adsController.showRewardedAd(
+                                  onRewardGranted: () {
+                                    int seed = dailyController.getDailySeed();
+                                    Get.to(() => CalculateNumbersScreen(
+                                        selectedMode: OperationMode.auto,
+                                        isDailyChallenge: true,
+                                        dailySeed: seed));
+                                  },
+                                );
                               },
                             )),
 
-                        SizedBox(height: 30.h),
+                        SizedBox(height: 12.h),
 
                         // --- Game Modes ---
                         Row(
@@ -370,7 +372,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           },
                         ),
 
-                        SizedBox(height: 30.h),
+                        SizedBox(height: 14.h),
+                        Obx(
+                          () => adsController.isBannerAdLoaded.value
+                              ? SizedBox(
+                                  height: AdSize.banner.height.toDouble(),
+                                  child: AdWidget(ad: adsController.bannerAd!))
+                              : const SizedBox.shrink(),
+                        ),
+
+                        SizedBox(height: 14.h),
 
                         // --- Premium Banner Section ---
                         Padding(
@@ -526,8 +537,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onTap();
       },
       borderRadius: 32.r,
-      padding: EdgeInsets.all(16.w),
+      //padding: EdgeInsets.all(10.w),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // 3D Icon with glow
           Stack(
@@ -572,7 +584,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             style: GoogleFonts.quicksand(
               fontSize: 11.sp,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFFE9D5FF).withOpacity(0.7),
+              color: const Color(0xFFE9D5FF),
               height: 1.1,
             ),
             textAlign: TextAlign.center,

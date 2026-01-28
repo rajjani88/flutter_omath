@@ -1,3 +1,4 @@
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_omath/utils/consts.dart';
@@ -88,12 +89,16 @@ class CurrencyController extends GetxController implements GetxService {
   /// Placeholder for rewarded ad integration.
   /// Call this after ad successfully watched.
   void watchAdForCoins() {
-    addCoins(kCoinsFromAd);
-    Get.snackbar(
-      "🎉 Bonus!",
-      "+$kCoinsFromAd Coins added!",
-      snackPosition: SnackPosition.TOP,
-      duration: const Duration(seconds: 2),
+    Get.find<AdsController>().showRewardedAd(
+      onRewardGranted: () {
+        addCoins(kCoinsFromAd);
+        Get.snackbar(
+          "🎉 Bonus!",
+          "+$kCoinsFromAd Coins added!",
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 2),
+        );
+      },
     );
   }
 

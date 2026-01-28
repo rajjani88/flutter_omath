@@ -47,6 +47,10 @@ class AdsController extends GetxController implements GetxService {
   @override
   void onInit() {
     super.onInit();
+    // _loadBannerAd1();
+    // _loadBannerAd2();
+    // _loadBannerAd3();
+    _loadBannerAd();
     _loadInterstitialAd();
     _loadRewardedAd();
   }

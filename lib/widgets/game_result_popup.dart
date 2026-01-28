@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class GameResultPopup extends StatefulWidget {
@@ -220,7 +222,12 @@ class _GameResultPopupState extends State<GameResultPopup>
                             // Add a small delay to show ripple
                             Future.delayed(const Duration(milliseconds: 150),
                                 () {
-                              widget.onRetry();
+                              Get.find<AdsController>().showRewardedAd(
+                                onRewardGranted: () {
+                                  // Retry after ad
+                                  widget.onRetry();
+                                },
+                              );
                             });
                           },
                           child: Container(
