@@ -1,18 +1,23 @@
-# flutter_omath
+# Mathwize - Learn Math based games for Brain Training 
 
-A new Flutter project.
+## TechStack
+- Flutter and Getx
+- Supabase 
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Version and Updates
+<table>
+<tr>
+<td> Date</td>
+<td> Version name</td>
+<td> Description</td>
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+</tr>
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-updated untill final 
+<tr>
+<td> 29.1.26</td>
+<td> 1.11.0</td>
+<td> New Look and UI </td>
+</tr>
+</table>

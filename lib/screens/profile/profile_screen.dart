@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
@@ -31,6 +33,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
 
+  final AdsController adsController = Get.find<AdsController>();
+
+  Timer? _adsTimer;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +51,17 @@ class _ProfileScreenState extends State<ProfileScreen>
     _bounceAnimation = Tween<double>(begin: -5, end: 5).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
+    showAds();
+  }
+
+  showAds() {
+    if (_adsTimer != null) {
+      return;
+    }
+    log('timer is started');
+    _adsTimer = Timer(const Duration(seconds: 10), () {
+      adsController.showInterstitialAd();
+    });
   }
 
   @override
@@ -52,6 +69,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     nameController.dispose();
     _bounceController.dispose();
     _debounce?.cancel();
+    if (_adsTimer != null) {
+      _adsTimer!.cancel();
+    }
     super.dispose();
   }
 

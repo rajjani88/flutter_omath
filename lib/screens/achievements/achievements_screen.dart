@@ -1,5 +1,7 @@
-import 'dart:ui';
+import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:flutter_omath/widgets/glass_card.dart'; // New Import
 import 'package:flutter_omath/widgets/floating_background.dart'; // New Import
@@ -9,19 +11,51 @@ import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class AchievementsScreen extends StatelessWidget {
+class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final UserController userController = Get.find<UserController>();
-    final AchievementController achievementController =
-        Get.find<AchievementController>();
+  State<AchievementsScreen> createState() => _AchievementsScreenState();
+}
 
-    // Theme Colors
-    const Color bgStart = Color(0xFF2d1b4e);
-    const Color bgMid = Color(0xFF1a0b2e);
-    const Color bgEnd = Color(0xFF0f071a);
+class _AchievementsScreenState extends State<AchievementsScreen> {
+  final UserController userController = Get.find<UserController>();
+  final AchievementController achievementController =
+      Get.find<AchievementController>();
+
+  // Theme Colors
+
+  final AdsController adsController = Get.find<AdsController>();
+  Timer? _adsTimer;
+
+  void showAds() {
+    if (_adsTimer != null) {
+      return;
+    }
+    log('timer is started');
+    _adsTimer = Timer(const Duration(seconds: 13), () {
+      adsController.showInterstitialAd();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    showAds();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _adsTimer?.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color bgStart = const Color(0xFF2d1b4e);
+    Color bgMid = const Color(0xFF1a0b2e);
+    Color bgEnd = const Color(0xFF0f071a);
 
     return Scaffold(
       backgroundColor: bgEnd,
@@ -41,7 +75,7 @@ class AchievementsScreen extends StatelessWidget {
       body: Stack(
         children: [
           // 1. Background Gradient
-          const Positioned.fill(
+          Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

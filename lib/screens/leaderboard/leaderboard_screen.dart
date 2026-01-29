@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/leaderboard_controller.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
@@ -10,10 +14,42 @@ import 'package:get/get.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LeaderboardScreen extends StatelessWidget {
-  LeaderboardScreen({super.key});
+class LeaderboardScreen extends StatefulWidget {
+  const LeaderboardScreen({super.key});
 
+  @override
+  State<LeaderboardScreen> createState() => _LeaderboardScreenState();
+}
+
+class _LeaderboardScreenState extends State<LeaderboardScreen> {
   final LeaderboardController controller = Get.find<LeaderboardController>();
+  final AdsController adsController = Get.find<AdsController>();
+  Timer? _adsTimer;
+
+  void showAds() {
+    if (_adsTimer != null) {
+      return;
+    }
+    log('timer is started');
+    _adsTimer = Timer(const Duration(seconds: 13), () {
+      adsController.showInterstitialAd();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    showAds();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_adsTimer != null) {
+      _adsTimer!.cancel();
+      _adsTimer = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

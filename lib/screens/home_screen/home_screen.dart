@@ -384,98 +384,98 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         SizedBox(height: 14.h),
 
                         // --- Premium Banner Section ---
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: GlassCard(
-                            onTap: () {
-                              soundController.playClick();
-                              Get.to(() => const GoProScreen());
-                            },
-                            borderRadius: 32,
-                            padding: const EdgeInsets.all(24),
-                            // Gradient: Purple to Blue low opacity
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.purple.withOpacity(0.2),
-                                Colors.blue.withOpacity(0.2),
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                            child: Row(
-                              children: [
-                                // Crown Icon Container
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFFBBF24), // Amber 400
-                                        Color(0xFFF97316), // Orange 500
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.orange.withOpacity(0.4),
-                                        blurRadius: 12.r,
-                                        offset: Offset(0, 4.h),
-                                      )
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.workspace_premium_rounded,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                // Text Content
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Premium Plan",
-                                        style: GoogleFonts.quicksand(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        "Unlock infinite hearts & juicy themes.",
-                                        style: GoogleFonts.quicksand(
-                                          fontSize: 12,
-                                          color: Colors.white70,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Arrow Button
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.arrow_forward_rounded,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.symmetric(horizontal: 4),
+                        //   child: GlassCard(
+                        //     onTap: () {
+                        //       soundController.playClick();
+                        //       Get.to(() => const GoProScreen());
+                        //     },
+                        //     borderRadius: 32,
+                        //     padding: const EdgeInsets.all(24),
+                        //     // Gradient: Purple to Blue low opacity
+                        //     gradient: LinearGradient(
+                        //       colors: [
+                        //         Colors.purple.withOpacity(0.2),
+                        //         Colors.blue.withOpacity(0.2),
+                        //       ],
+                        //       begin: Alignment.centerLeft,
+                        //       end: Alignment.centerRight,
+                        //     ),
+                        //     child: Row(
+                        //       children: [
+                        //         // Crown Icon Container
+                        //         Container(
+                        //           width: 48,
+                        //           height: 48,
+                        //           decoration: BoxDecoration(
+                        //             borderRadius: BorderRadius.circular(16),
+                        //             gradient: const LinearGradient(
+                        //               colors: [
+                        //                 Color(0xFFFBBF24), // Amber 400
+                        //                 Color(0xFFF97316), // Orange 500
+                        //               ],
+                        //               begin: Alignment.topLeft,
+                        //               end: Alignment.bottomRight,
+                        //             ),
+                        //             boxShadow: [
+                        //               BoxShadow(
+                        //                 color: Colors.orange.withOpacity(0.4),
+                        //                 blurRadius: 12.r,
+                        //                 offset: Offset(0, 4.h),
+                        //               )
+                        //             ],
+                        //           ),
+                        //           child: const Icon(
+                        //             Icons.workspace_premium_rounded,
+                        //             color: Colors.white,
+                        //             size: 24,
+                        //           ),
+                        //         ),
+                        //         const SizedBox(width: 16),
+                        //         // Text Content
+                        //         Expanded(
+                        //           child: Column(
+                        //             crossAxisAlignment:
+                        //                 CrossAxisAlignment.start,
+                        //             children: [
+                        //               Text(
+                        //                 "Premium Plan",
+                        //                 style: GoogleFonts.quicksand(
+                        //                   fontSize: 18,
+                        //                   fontWeight: FontWeight.bold,
+                        //                   color: Colors.white,
+                        //                 ),
+                        //               ),
+                        //               const SizedBox(height: 4),
+                        //               Text(
+                        //                 "Unlock infinite hearts & juicy themes.",
+                        //                 style: GoogleFonts.quicksand(
+                        //                   fontSize: 12,
+                        //                   color: Colors.white70,
+                        //                 ),
+                        //               ),
+                        //             ],
+                        //           ),
+                        //         ),
+                        //         const SizedBox(width: 12),
+                        //         // Arrow Button
+                        //         Container(
+                        //           padding: const EdgeInsets.all(8),
+                        //           decoration: BoxDecoration(
+                        //             color: Colors.white.withOpacity(0.1),
+                        //             shape: BoxShape.circle,
+                        //           ),
+                        //           child: const Icon(
+                        //             Icons.arrow_forward_rounded,
+                        //             color: Colors.white,
+                        //             size: 16,
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
 
                         SizedBox(height: 30.h),
                       ],
