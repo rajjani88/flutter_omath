@@ -20,4 +20,9 @@
 <td> 1.11.0</td>
 <td> New Look and UI </td>
 </tr>
+<tr>
+<td> 2.2.26</td>
+<td> 1.12.0</td>
+<td>env added, hints hide</td>
+</tr>
 </table>
