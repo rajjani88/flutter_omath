@@ -1,14 +1,10 @@
 /// Supabase Configuration
 /// Replace with your actual Supabase credentials
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseConfig {
-  // TODO: Replace with your Supabase project URL
-  static const String supabaseUrl = 'https://wmxtrrmszbccxgwqsucq.supabase.co';
-
-  // TODO: Replace with your Supabase anon key
-  static const String supabaseAnonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndteHRycm1zemJjY3hnd3FzdWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2MzkzNzcsImV4cCI6MjA4NDIxNTM3N30.e2unzDnkYnY0o6TpEty3FHVXzv5nXXP3ZjiGVhPJhSw';
-
+  static String supabaseUrl = dotenv.env['supabase_url'] ?? '';
+  static String supabaseAnonKey = dotenv.env['supabase_anonkey'] ?? '';
   // Avatar asset paths (based on avatar_id 0-4)
   static String getAvatarPath(int avatarId) {
     // Clamp to valid range (0-25)
