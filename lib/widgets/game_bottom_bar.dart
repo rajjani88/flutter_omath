@@ -52,6 +52,7 @@ class GameBottomBar extends StatelessWidget {
   final VoidCallback onFreeze;
   final VoidCallback onSkip;
   final bool showFreeze; // Some games don't have timers
+  final bool showhint;
 
   const GameBottomBar({
     super.key,
@@ -59,6 +60,7 @@ class GameBottomBar extends StatelessWidget {
     required this.onFreeze,
     required this.onSkip,
     this.showFreeze = true,
+    this.showhint = false,
   });
 
   @override
@@ -69,13 +71,14 @@ class GameBottomBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // Hint
-          PowerUpButton(
-            icon: Icons.lightbulb,
-            label: "Hint",
-            cost: kHintCost,
-            color: Colors.orange,
-            onActivate: onHint,
-          ),
+          if (showhint)
+            PowerUpButton(
+              icon: Icons.lightbulb,
+              label: "Hint",
+              cost: kHintCost,
+              color: Colors.orange,
+              onActivate: onHint,
+            ),
           // Freeze Time (optional)
           if (showFreeze)
             PowerUpButton(
