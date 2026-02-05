@@ -114,7 +114,7 @@ class MathMazeController extends GetxController {
 
     if (movesMade.value == moveLimit.value) {
       if (isClosed) return;
-      Get.find<AdsController>().showInterstitialAd();
+      //Get.find<AdsController>().showInterstitialAd();
 
       if (currentNumber.value == targetNumber.value) {
         level.value++;

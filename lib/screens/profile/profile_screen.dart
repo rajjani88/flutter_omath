@@ -33,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
 
-  final AdsController adsController = Get.find<AdsController>();
+  //final AdsController adsController = Get.find<AdsController>();
 
   Timer? _adsTimer;
 
@@ -59,9 +59,9 @@ class _ProfileScreenState extends State<ProfileScreen>
       return;
     }
     log('timer is started');
-    _adsTimer = Timer(const Duration(seconds: 10), () {
-      adsController.showInterstitialAd();
-    });
+    // _adsTimer = Timer(const Duration(seconds: 10), () {
+    //   adsController.showInterstitialAd();
+    // });
   }
 
   @override

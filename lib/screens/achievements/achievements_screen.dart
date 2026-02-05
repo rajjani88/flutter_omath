@@ -25,7 +25,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
 
   // Theme Colors
 
-  final AdsController adsController = Get.find<AdsController>();
+  //final AdsController adsController = Get.find<AdsController>();
   Timer? _adsTimer;
 
   void showAds() {
@@ -34,7 +34,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     }
     log('timer is started');
     _adsTimer = Timer(const Duration(seconds: 13), () {
-      adsController.showInterstitialAd();
+      // adsController.showInterstitialAd();
     });
   }
 

@@ -27,8 +27,8 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
   // AdsController adsController = Get.find(); // Used inside controller mostly or for interstitial
   // InAppPurchaseController purchaseController = Get.find(); // Used locally for restart
   final SoundController soundController = Get.find<SoundController>();
-  final AdsController adsController = Get.find();
-  final InAppPurchaseController purchaseController = Get.find();
+  // final AdsController adsController = Get.find();
+  // final InAppPurchaseController purchaseController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -197,9 +197,9 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                   isTimeUp: true,
                   onRetry: () {
                     // Logic for retry
-                    if (!purchaseController.isPro.value) {
-                      adsController.showInterstitialAd();
-                    }
+                    // if (!purchaseController.isPro.value) {
+                    //   adsController.showInterstitialAd();
+                    // }
                     controller.startGame();
                   },
                   onHome: () => Get.offAll(() => const HomeScreen()),

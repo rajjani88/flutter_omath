@@ -1,11 +1,11 @@
 name: flutter_omath
-description: "A New Version of already uploeded application OMath puzzle app"
+description: "This Ad free and Subscription free PRO version"
 
 publish_to: 'none' 
 
 
 
-version: 1.12.0+12
+version: 1.2.0+2
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -19,8 +19,8 @@ dependencies:
   collection: ^1.19.1
   url_launcher: ^6.3.1
   fluttertoast: ^8.2.12
-  in_app_purchase: ^3.2.3
-  google_mobile_ads: ^6.0.0
+  #in_app_purchase: ^3.2.3
+  #google_mobile_ads: ^6.0.0
   shared_preferences: ^2.5.3
   audioplayers: ^6.1.0
   confetti: ^0.8.0

@@ -116,7 +116,7 @@ class ArrangeNumberController extends GetxController implements GetxService {
 
     if (isCorrect) {
       score.value += 10 * level.value;
-      Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+      // Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
       Get.find<SoundController>().playSuccess();
 
       _updateLeaderboard();

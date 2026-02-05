@@ -89,17 +89,17 @@ class CurrencyController extends GetxController implements GetxService {
   /// Placeholder for rewarded ad integration.
   /// Call this after ad successfully watched.
   void watchAdForCoins() {
-    Get.find<AdsController>().showRewardedAd(
-      onRewardGranted: () {
-        addCoins(kCoinsFromAd);
-        Get.snackbar(
-          "🎉 Bonus!",
-          "+$kCoinsFromAd Coins added!",
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(seconds: 2),
-        );
-      },
+    //Get.find<AdsController>().showRewardedAd(
+    //   onRewardGranted: () {
+    addCoins(kCoinsFromAd);
+    Get.snackbar(
+      "🎉 Bonus!",
+      "+$kCoinsFromAd Coins added!",
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 2),
     );
+    //   },
+    // );
   }
 
   /// Check if user can afford a purchase without deducting.

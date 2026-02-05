@@ -27,8 +27,8 @@ Future<void> init() async {
   Get.lazyPut(() => MathMazeController(), fenix: true);
 
   // Core App Controllers
-  Get.lazyPut(() => AdsController(sp: Get.find()), fenix: true);
-  Get.lazyPut(() => InAppPurchaseController(sp: Get.find()), fenix: true);
+  //Get.lazyPut(() => AdsController(sp: Get.find()), fenix: true);
+  //Get.lazyPut(() => InAppPurchaseController(sp: Get.find()), fenix: true);
   Get.lazyPut(() => SoundController(), fenix: true);
   Get.lazyPut(() => CurrencyController(), fenix: true);
   Get.lazyPut(() => DailyChallengeController(prefs: sharedPreferences),

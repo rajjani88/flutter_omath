@@ -264,14 +264,14 @@ class UserController extends GetxController {
   /// Update avatar
   Future<void> updateAvatar(int newAvatarId) async {
     // Check for premium avatars (ID > 4)
-    if (newAvatarId > 4) {
-      final iapController = Get.find<InAppPurchaseController>();
-      if (!iapController.isPro.value) {
-        // Redirect to Go Pro screen if trying to select locked avatar
-        Get.to(() => const GoProScreen());
-        return;
-      }
-    }
+    // if (newAvatarId > 4) {
+    //   final iapController = Get.find<InAppPurchaseController>();
+    //   if (!iapController.isPro.value) {
+    //      Redirect to Go Pro screen if trying to select locked avatar
+    //     Get.to(() => const GoProScreen());
+    //     return;
+    //   }
+    // }
 
     avatarId.value = newAvatarId.clamp(0, 25);
     await _updateProfile({'avatar_id': avatarId.value});

@@ -12,8 +12,8 @@ class AvatarGalleryModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final UserController userController = Get.find<UserController>();
-    final InAppPurchaseController iapController =
-        Get.find<InAppPurchaseController>();
+    // final InAppPurchaseController iapController =
+    //     Get.find<InAppPurchaseController>();
 
     return Container(
       height: Get.height * 0.8,
@@ -68,7 +68,7 @@ class AvatarGalleryModal extends StatelessWidget {
           // Grid
           Expanded(
             child: Obx(() {
-              final isPremium = iapController.isPro.value;
+              final isPremium = true;
               final currentAvatarId = userController.avatarId.value;
 
               return GridView.builder(
@@ -86,12 +86,8 @@ class AvatarGalleryModal extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      if (isLocked) {
-                        Get.to(() => const GoProScreen());
-                      } else {
-                        userController.updateAvatar(index);
-                        Get.back();
-                      }
+                      userController.updateAvatar(index);
+                      Get.back();
                     },
                     child: Stack(
                       children: [
@@ -127,25 +123,6 @@ class AvatarGalleryModal extends StatelessWidget {
                             ),
                           ),
                         ),
-
-                        // Lock Overlay
-                        if (isLocked)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFC084FC),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.lock_rounded,
-                                color: Colors.white,
-                                size: 12,
-                              ),
-                            ),
-                          ),
 
                         // Selected Indicator
                         if (isSelected)

@@ -1,4 +1,4 @@
-package com.raj.omath
+package com.mathwize.pro
 
 import io.flutter.embedding.android.FlutterActivity
 

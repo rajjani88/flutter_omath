@@ -27,7 +27,6 @@ import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_omath/widgets/streak_components.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // --- Main Screen ---
 
@@ -45,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final DailyChallengeController dailyController =
       Get.find<DailyChallengeController>(); // Inject
   final SoundController soundController = Get.find<SoundController>();
-  final AdsController adsController = Get.find();
 
   // Bottom Nav State
   String activeTab = 'home'; // home, games, rank, stats
@@ -316,15 +314,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               isCompleted:
                                   dailyController.isTodayCompleted.value,
                               onPlay: () {
-                                adsController.showRewardedAd(
-                                  onRewardGranted: () {
-                                    int seed = dailyController.getDailySeed();
-                                    Get.to(() => CalculateNumbersScreen(
-                                        selectedMode: OperationMode.auto,
-                                        isDailyChallenge: true,
-                                        dailySeed: seed));
-                                  },
-                                );
+                                int seed = dailyController.getDailySeed();
+                                Get.to(() => CalculateNumbersScreen(
+                                    selectedMode: OperationMode.auto,
+                                    isDailyChallenge: true,
+                                    dailySeed: seed));
                               },
                             )),
 
@@ -373,15 +367,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
 
                         SizedBox(height: 14.h),
-                        Obx(
-                          () => adsController.isBannerAdLoaded.value
-                              ? SizedBox(
-                                  height: AdSize.banner.height.toDouble(),
-                                  child: AdWidget(ad: adsController.bannerAd!))
-                              : const SizedBox.shrink(),
-                        ),
+                        // Obx(
+                        //   () => adsController.isBannerAdLoaded.value
+                        //       ? SizedBox(
+                        //           height: AdSize.banner.height.toDouble(),
+                        //           child: AdWidget(ad: adsController.bannerAd!))
+                        //       : const SizedBox.shrink(),
+                        // ),
 
-                        SizedBox(height: 14.h),
+                        // SizedBox(height: 14.h),
 
                         // --- Premium Banner Section ---
                         // Padding(

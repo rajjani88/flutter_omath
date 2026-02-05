@@ -6,7 +6,6 @@ import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:get/get_navigation/get_navigation.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'utils/get_di.dart' as getit;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -32,7 +31,6 @@ void main() async {
     debugPrint("Supabase init failed: $e");
   }
 
-  await MobileAds.instance.initialize();
   await getit.init();
   runApp(const MyApp());
 }

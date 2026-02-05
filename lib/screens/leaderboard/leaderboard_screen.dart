@@ -23,7 +23,7 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   final LeaderboardController controller = Get.find<LeaderboardController>();
-  final AdsController adsController = Get.find<AdsController>();
+  //final AdsController adsController = Get.find<AdsController>();
   Timer? _adsTimer;
 
   void showAds() {
@@ -31,9 +31,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       return;
     }
     log('timer is started');
-    _adsTimer = Timer(const Duration(seconds: 13), () {
-      adsController.showInterstitialAd();
-    });
+    // _adsTimer = Timer(const Duration(seconds: 13), () {
+    //   adsController.showInterstitialAd();
+    // });
   }
 
   @override

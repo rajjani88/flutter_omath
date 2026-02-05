@@ -222,12 +222,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                             // Add a small delay to show ripple
                             Future.delayed(const Duration(milliseconds: 150),
                                 () {
-                              Get.find<AdsController>().showRewardedAd(
-                                onRewardGranted: () {
-                                  // Retry after ad
-                                  widget.onRetry();
-                                },
-                              );
+                              widget.onRetry();
                             });
                           },
                           child: Container(

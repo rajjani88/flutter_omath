@@ -172,7 +172,7 @@ class CalculateNumbersController extends GetxController implements GetxService {
       }
 
       // Award coins for correct answer
-      Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+      //Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
       Get.find<SoundController>().playSuccess();
 
       // Future Integrations

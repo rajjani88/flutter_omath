@@ -1,6 +1,6 @@
 class AppConfig {
   // --- BRANDING ---
-  static const String appName = "Mathwize";
+  static const String appName = "Mathwize Pro";
   static const String appVersion = "1.0.0";
 
   // --- LINKS & SUPPORT ---
@@ -8,9 +8,9 @@ class AppConfig {
       'https://sites.google.com/view/brainy-math-app/privacy-policy';
   static const String termsUrl =
       "https://sites.google.com/view/brainy-math-app/terms-and-conditions";
-  static const String rateUsUrl = "market://details?id=com.raj.omath";
+  static const String rateUsUrl = "market://details?id=com.mathwize.pro";
   static const String rateUsWebUrl =
-      "https://play.google.com/store/apps/details?id=com.raj.omath";
+      "https://play.google.com/store/apps/details?id=com.mathwize.pro";
   static const String supportEmail = "support@example.com";
 
   // --- ASSETS ---
