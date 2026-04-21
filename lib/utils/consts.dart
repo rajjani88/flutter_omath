@@ -19,7 +19,7 @@ class AppConfig {
 
   // --- ECONOMY ---
   static const int startingCoins = 20;
-  static const int coinsPerWin = 20;
+  static const int coinsPerWin = 5;
   static const int coinsFromAd = 10;
   static const int shareRewardCoins = 50;
 
