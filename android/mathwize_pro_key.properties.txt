@@ -1,0 +1,4 @@
+storePassword=123456
+keyPassword=123456
+keyAlias=upload
+storeFile=/Users/rajjani/Developer/omath_game_project/KEY_STORE/mathwize_pro.jks

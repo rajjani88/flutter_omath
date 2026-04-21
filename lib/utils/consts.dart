@@ -1,7 +1,7 @@
 class AppConfig {
   // --- BRANDING ---
   static const String appName = "Mathwize";
-  static const String appVersion = "1.0.0";
+  static const String appVersion = "1.13.0";
 
   // --- LINKS & SUPPORT ---
   static const String privacyPolicyUrl =
