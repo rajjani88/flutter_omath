@@ -18,7 +18,7 @@ class AppConfig {
   static const String baseImgPath = 'assets/images';
 
   // --- ECONOMY ---
-  static const int startingCoins = 40;
+  static const int startingCoins = 20;
   static const int coinsPerWin = 20;
   static const int coinsFromAd = 10;
   static const int shareRewardCoins = 50;
