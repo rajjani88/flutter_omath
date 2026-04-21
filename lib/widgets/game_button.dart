@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -24,7 +23,7 @@ class GameButton extends StatefulWidget {
     this.color = GameColors.secondary,
     this.shadowColor = GameColors.secondaryShadow,
     this.width = double.infinity,
-    this.height = 60,
+    this.height = 40,
     this.fontSize = 20,
     this.icon,
     this.textColor,
@@ -54,13 +53,6 @@ class _GameButtonState extends State<GameButton>
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void _handleTap() async {
-    soundController.playClick();
-    await _controller.forward();
-    await _controller.reverse();
-    widget.onTap();
   }
 
   @override

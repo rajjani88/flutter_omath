@@ -11,6 +11,8 @@ class CurrencyController extends GetxController implements GetxService {
 
   final RxInt coinBalance = 0.obs;
   final RxInt totalSpent = 0.obs; // Track for "Big Spender" achievement
+  final RxInt lastRewardAmount = 0.obs; // Track for "Double your reward" ad
+  final RxInt sessionCoins = 0.obs; // Track coins earned in current session
   late SharedPreferences _prefs;
 
   @override
@@ -56,8 +58,14 @@ class CurrencyController extends GetxController implements GetxService {
   }
 
   /// Add coins when user wins a level or watches an ad.
-  void addCoins(int amount) {
+  void addCoins(int amount, {bool trackAsReward = true, bool isSession = true}) {
     coinBalance.value += amount;
+    if (trackAsReward) {
+      lastRewardAmount.value = amount;
+    }
+    if (isSession) {
+      sessionCoins.value += amount;
+    }
     _saveBalance();
   }
 
@@ -104,4 +112,39 @@ class CurrencyController extends GetxController implements GetxService {
 
   /// Check if user can afford a purchase without deducting.
   bool canAfford(int cost) => coinBalance.value >= cost;
+
+  /// Triggered after game success to double the last reward.
+  void doubleLastReward() {
+    if (lastRewardAmount.value > 0) {
+      int bonus = lastRewardAmount.value;
+      addCoins(bonus, trackAsReward: false, isSession: false);
+      lastRewardAmount.value = 0; // Reset after doubling
+      Get.snackbar(
+        "💎 Double Reward!",
+        "+$bonus Coins added!",
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
+
+  /// Reset session counter when a new game starts
+  void resetSession() {
+    sessionCoins.value = 0;
+  }
+
+  /// Double the total coins earned in this session
+  void doubleSessionCoins() {
+    if (sessionCoins.value > 0) {
+      int bonus = sessionCoins.value;
+      addCoins(bonus, trackAsReward: false, isSession: false);
+      sessionCoins.value = 0; // Reset after doubling
+      Get.snackbar(
+        "💰 Session Doubled!",
+        "+$bonus Coins added!",
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
 }

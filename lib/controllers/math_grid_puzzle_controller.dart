@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
+import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
+import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
+import 'package:flutter_omath/widgets/daily_challenge_success_popup.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
@@ -15,13 +18,17 @@ class MathGridPuzzleController extends GetxController {
   final level = 1.obs;
   final question = ''.obs;
   final answerOptions = <int>[].obs;
-  final timeLeft = 30.obs;
+  final lives = 3.obs;
+  final extraLivesGained = 0.obs;
   final isGameOver = false.obs;
 
-  final _random = Random();
+  // Daily Challenge
+  bool isDailyChallenge = false;
+  int? dailySeed;
+  static const int dailyChallengeTargetLevel = 6; // Complete 5 levels
+
+  var _random = Random();
   late int _correctAnswer;
-  late Timer _timer;
-  Timer? _freezeTimer;
 
   // Power-Up States
   RxBool isTimeFrozen = false.obs;
@@ -34,33 +41,15 @@ class MathGridPuzzleController extends GetxController {
   }
 
   void startGame() {
+    Get.find<CurrencyController>().resetSession();
+    if (dailySeed != null) {
+      _random = Random(dailySeed!);
+    }
     level.value = 1;
-    timeLeft.value = 30;
+    lives.value = 3;
+    extraLivesGained.value = 0;
     isGameOver.value = false;
     _generateNewQuestion();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      // Don't decrement if frozen
-      if (isTimeFrozen.value) return;
-
-      if (timeLeft.value == 0) {
-        t.cancel();
-        isGameOver.value = true;
-        Get.find<SoundController>().playWrong();
-      } else {
-        timeLeft.value--;
-      }
-    });
-  }
-
-  @override
-  void onClose() {
-    _timer.cancel();
-    _freezeTimer?.cancel();
-    super.onClose();
   }
 
   void _generateNewQuestion() {
@@ -118,23 +107,51 @@ class MathGridPuzzleController extends GetxController {
       level.value++;
       Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
       Get.find<SoundController>().playSuccess();
-      int newTime = max(10, 30 - level.value);
-      timeLeft.value = newTime;
+      Get.find<AdsController>().onLevelCompleted();
 
       _updateLeaderboard();
       _checkAchievements();
-    } else {
-      timeLeft.value = max(0, timeLeft.value - 5);
-      Get.find<SoundController>().playWrong();
-      Fluttertoast.showToast(msg: "Wrong! -5s");
-    }
 
-    if (timeLeft.value > 0) {
+      if (isDailyChallenge && level.value >= dailyChallengeTargetLevel) {
+        final dc = Get.find<DailyChallengeController>();
+        dc.completeChallenge();
+        Get.dialog(
+          DailyChallengeSuccessPopup(
+            streak: dc.currentStreak.value,
+            onContinue: () => Get.offAll(() => const HomeScreen()),
+          ),
+          barrierDismissible: false,
+        );
+        return;
+      }
+
       _generateNewQuestion();
     } else {
-      _timer.cancel();
-      isGameOver.value = true;
+      lives.value--;
       Get.find<SoundController>().playWrong();
+
+      if (lives.value <= 0) {
+        isGameOver.value = true;
+      } else {
+        Fluttertoast.showToast(msg: "Wrong! ${lives.value} lives left");
+        _generateNewQuestion();
+      }
+    }
+  }
+
+  void solveLevel() {
+    level.value++;
+    Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+    Get.find<SoundController>().playSuccess();
+    _generateNewQuestion();
+  }
+
+  void addExtraLife() {
+    if (extraLivesGained.value < 2) {
+      lives.value++;
+      extraLivesGained.value++;
+      Fluttertoast.showToast(
+          msg: "Extra Life Added! (${extraLivesGained.value}/2)");
     }
   }
 
@@ -153,20 +170,10 @@ class MathGridPuzzleController extends GetxController {
     isTimeFrozen.value = true;
     Get.snackbar("❄️ Time Frozen!", "10 seconds of peace...",
         snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 2));
-
-    _freezeTimer?.cancel();
-    _freezeTimer = Timer(const Duration(seconds: kFreezeDuration), () {
-      isTimeFrozen.value = false;
-      Get.snackbar("⏱️ Time Resumed!", "Back to action!",
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(seconds: 1));
-    });
   }
 
   void skipLevel() {
     level.value++;
-    int newTime = max(10, 30 - level.value);
-    timeLeft.value = newTime;
     _generateNewQuestion();
     Get.snackbar("⏭️ Skipped!", "Moving to Level ${level.value}",
         snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 1));

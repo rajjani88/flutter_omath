@@ -83,9 +83,9 @@ class StreakHomeCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(22),
           gradient: const LinearGradient(
             colors: [StreakColors.orangeStart, StreakColors.redEnd],
             begin: Alignment.topLeft,
@@ -105,7 +105,7 @@ class StreakHomeCard extends StatelessWidget {
           child: Stack(
             children: [
               // Background Decor
-              Positioned(
+              const Positioned(
                 right: -20,
                 bottom: -20,
                 child: Opacity(
@@ -143,7 +143,7 @@ class StreakHomeCard extends StatelessWidget {
                                 Text(
                                   "$streakCount",
                                   style: GoogleFonts.fredoka(
-                                    fontSize: 48,
+                                    fontSize: 28,
                                     fontWeight: FontWeight.w900,
                                     color: Colors.white,
                                     height: 1,
@@ -153,7 +153,7 @@ class StreakHomeCard extends StatelessWidget {
                                 Text(
                                   "Days",
                                   style: GoogleFonts.nunito(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.orange.shade100,
                                   ),
@@ -167,12 +167,12 @@ class StreakHomeCard extends StatelessWidget {
                           width: 60,
                           height: 60,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white30,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.white30),
                           ),
                           child: const Center(
-                            child: PulsingFlameIcon(size: 32),
+                            child: PulsingFlameIcon(size: 26),
                           ),
                         ),
                       ],
@@ -183,7 +183,7 @@ class StreakHomeCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black12,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -206,11 +206,11 @@ class StreakHomeCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black26,
                                     blurRadius: 4,
-                                    offset: const Offset(0, 2),
+                                    offset: Offset(0, 2),
                                   )
                                 ],
                               ),
@@ -357,7 +357,7 @@ class StreakProfileCard extends StatelessWidget {
                     color: Colors.white,
                     letterSpacing: 1.5,
                     shadows: [
-                      Shadow(
+                      const Shadow(
                         color: Colors.black26,
                         offset: Offset(0, 2),
                         blurRadius: 4,

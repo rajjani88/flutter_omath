@@ -44,13 +44,18 @@ class DailyChallengeController extends GetxController {
 
         if (difference > 1) {
           // Streak broken
-          // Don't reset here immediately, maybe wait until they actually play?
-          // Requirement says: "If the user missed yesterday, reset the streak to 1."
-          // Usually resetting happens when they try to play or when they complete the new challenge.
-          // Leaving it as is for now, will handle reset on completion or just display 0 if we want strict logic.
+          currentStreak.value = 0;
+          _prefs.setInt(keyStreak, 0);
         }
       }
     }
+  }
+
+  // Choose game mode based on daily seed
+  // 0: Math Grid, 1: Sudoku
+  int getDailyGameMode() {
+    Random r = Random(getDailySeed());
+    return r.nextInt(2);
   }
 
   void completeChallenge() {

@@ -10,6 +10,7 @@ import 'package:flutter_omath/controllers/math_grid_puzzle_controller.dart';
 import 'package:flutter_omath/controllers/math_maze_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
+import 'package:flutter_omath/controllers/sudoku_controller.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +26,7 @@ Future<void> init() async {
   Get.lazyPut(() => CalculateNumbersController(), fenix: true);
   Get.lazyPut(() => MathGridPuzzleController(), fenix: true);
   Get.lazyPut(() => MathMazeController(), fenix: true);
+  Get.lazyPut(() => SudokuController(), fenix: true);
 
   // Core App Controllers
   Get.lazyPut(() => AdsController(sp: Get.find()), fenix: true);

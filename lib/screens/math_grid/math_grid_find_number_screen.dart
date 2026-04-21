@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/math_grid_puzzle_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -13,9 +14,17 @@ import 'package:get/get.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class MathGridFindNumber extends StatefulWidget {
-  const MathGridFindNumber({super.key});
+  final bool isDailyChallenge;
+  final int? dailySeed;
+
+  const MathGridFindNumber({
+    super.key,
+    this.isDailyChallenge = false,
+    this.dailySeed,
+  });
 
   @override
   State<MathGridFindNumber> createState() => _MathGridFindNumberState();
@@ -24,10 +33,13 @@ class MathGridFindNumber extends StatefulWidget {
 class _MathGridFindNumberState extends State<MathGridFindNumber> {
   final controller = Get.find<MathGridPuzzleController>();
   final soundController = Get.find<SoundController>();
+  final adsController = Get.find<AdsController>();
 
   @override
   void initState() {
     super.initState();
+    controller.isDailyChallenge = widget.isDailyChallenge;
+    controller.dailySeed = widget.dailySeed;
     controller.startGame();
   }
 
@@ -54,7 +66,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                     Text(
                       "Math Grid",
                       style: GoogleFonts.fredoka(
-                        fontSize: 24.sp,
+                        fontSize: 20.sp,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -71,7 +83,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               // HUD with Coins
               Padding(
@@ -82,13 +94,13 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                     Obx(() => _buildHUDChip("LEVEL",
                         "${controller.level.value}", GameColors.secondary)),
                     const CoinDisplayWidget(),
-                    Obx(() => _buildHUDChip("TIME",
-                        "${controller.timeLeft.value}s", GameColors.danger)),
+                    Obx(() => _buildHUDChip("LIVES",
+                        "${controller.lives.value}", GameColors.danger)),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // Question Panel
               FadeInDown(
@@ -96,7 +108,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                   width: double.infinity,
                   margin: EdgeInsets.symmetric(horizontal: 20.w),
                   padding:
-                      EdgeInsets.symmetric(vertical: 30.h, horizontal: 20.w),
+                      EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
                   decoration: BoxDecoration(
                     color: GameColors.panel,
                     borderRadius: BorderRadius.circular(24),
@@ -114,8 +126,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                         controller.question.value,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.nunito(
-                          fontSize: 28
-                              .sp, // Smaller than full equation but big enough
+                          fontSize: 24.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                         ),
@@ -123,16 +134,28 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // Answer Grid
               _buildAnswerGrid(controller),
 
               // Power-Up Bar
-              GamePowerUpBar(
-                onHint: () => controller.useHint(),
-                onFreeze: () => controller.freezeTime(),
-                onSkip: () => controller.skipLevel(),
+              Obx(() => GamePowerUpBar(
+                    onHint: () => controller.useHint(),
+                    onFreeze: () {}, // No timer
+                    onSkip: () => controller.skipLevel(),
+                    onSolve: () => controller.solveLevel(),
+                    onAddLife: () => controller.addExtraLife(),
+                    showFreeze: false,
+                    showSolve: true,
+                    showAddLife: controller.extraLivesGained.value < 2,
+                  )),
+              Obx(
+                () => adsController.isBannerAd1Loaded.value
+                    ? SizedBox(
+                        height: AdSize.banner.height.toDouble(),
+                        child: AdWidget(ad: adsController.bannerAd1!))
+                    : const SizedBox.shrink(),
               ),
               const SizedBox(height: 10),
             ],
@@ -142,9 +165,14 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                 ? GameResultPopup(
                     score: controller.level.value,
                     onRetry: () {
-                      controller.startGame();
+                      Get.find<AdsController>().showRewardedAd(
+                        onRewardGranted: () {
+                          controller.startGame();
+                        },
+                      );
                     },
                     onHome: () {
+                      Get.find<AdsController>().showInterstitialAd();
                       Get.offAll(() => const HomeScreen());
                     },
                   )
@@ -164,8 +192,8 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
             itemCount: controller.answerOptions.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              crossAxisSpacing: 16.w,
-              mainAxisSpacing: 16.h,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
               childAspectRatio: 1.0,
             ),
             itemBuilder: (_, index) {
@@ -176,7 +204,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                 delay: Duration(milliseconds: 50 * index),
                 child: GameButton(
                   text: "$item",
-                  fontSize: 28.sp,
+                  fontSize: 22.sp,
                   color:
                       isHighlighted ? Colors.green.shade400 : GameColors.panel,
                   shadowColor: Colors.black.withOpacity(0.3),
@@ -194,7 +222,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
 
   Widget _buildHUDChip(String label, String value, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(30.r),
@@ -207,17 +235,23 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
       ),
       child: Row(
         children: [
+          Icon(
+            label == "LIVES" ? Icons.favorite : null,
+            color: Colors.white,
+            size: 16.sp,
+          ),
+          if (label == "LIVES") SizedBox(width: 4.w),
           Text(
             "$label: ",
             style: GoogleFonts.fredoka(
-              fontSize: 12.sp,
+              fontSize: 10.sp,
               color: Colors.white.withOpacity(0.8),
             ),
           ),
           Text(
             value,
             style: GoogleFonts.fredoka(
-              fontSize: 20.sp,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

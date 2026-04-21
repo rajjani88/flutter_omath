@@ -51,16 +51,24 @@ class GameBottomBar extends StatelessWidget {
   final VoidCallback onHint;
   final VoidCallback onFreeze;
   final VoidCallback onSkip;
+  final VoidCallback? onSolve;
+  final VoidCallback? onAddLife;
   final bool showFreeze; // Some games don't have timers
   final bool showhint;
+  final bool showSolve;
+  final bool showAddLife;
 
   const GameBottomBar({
     super.key,
     required this.onHint,
     required this.onFreeze,
     required this.onSkip,
+    this.onSolve,
+    this.onAddLife,
     this.showFreeze = true,
     this.showhint = false,
+    this.showSolve = false,
+    this.showAddLife = false,
   });
 
   @override
@@ -77,6 +85,7 @@ class GameBottomBar extends StatelessWidget {
               label: "Hint",
               cost: kHintCost,
               color: Colors.orange,
+              description: "Reveal the correct answer!",
               onActivate: onHint,
             ),
           // Freeze Time (optional)
@@ -86,6 +95,7 @@ class GameBottomBar extends StatelessWidget {
               label: "Freeze",
               cost: kFreezeCost,
               color: Colors.cyan,
+              description: "Stop the timer for 10 seconds!",
               onActivate: onFreeze,
             ),
           // Skip Level
@@ -94,8 +104,29 @@ class GameBottomBar extends StatelessWidget {
             label: "Skip",
             cost: kSkipCost,
             color: GameColors.secondary,
+            description: "Skip to the next level!",
             onActivate: onSkip,
           ),
+          // Solve Level (Watch Ad)
+          if (showSolve && onSolve != null)
+            PowerUpButton(
+              icon: Icons.auto_fix_high,
+              label: "Solve",
+              cost: 0, // This will be free via ad in the RewardChoiceDialog logic
+              color: Colors.purple,
+              description: "Automatically solve this level!",
+              onActivate: onSolve!,
+            ),
+          // Add Life (Watch Ad)
+          if (showAddLife && onAddLife != null)
+            PowerUpButton(
+              icon: Icons.favorite,
+              label: "Life",
+              cost: 0,
+              color: Colors.redAccent,
+              description: "Earn 1 life. Max you can get 2!",
+              onActivate: onAddLife!,
+            ),
         ],
       ),
     );

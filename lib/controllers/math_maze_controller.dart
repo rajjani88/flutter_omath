@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
 import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
@@ -29,6 +28,9 @@ class MathMazeController extends GetxController {
   RxInt hintCol = (-1).obs;
 
   final isGameOver = false.obs;
+  final isGameWon = false.obs;
+
+  int get rewardedCoins => kCoinsPerCorrectAnswer;
 
   @override
   void onInit() {
@@ -37,6 +39,7 @@ class MathMazeController extends GetxController {
   }
 
   void generateNewLevel() {
+    Get.find<CurrencyController>().resetSession();
     isGameOver.value = false;
     movesMade.value = 0;
     hintRow.value = -1;
@@ -114,34 +117,18 @@ class MathMazeController extends GetxController {
 
     if (movesMade.value == moveLimit.value) {
       if (isClosed) return;
-      Get.find<AdsController>().showInterstitialAd();
 
       if (currentNumber.value == targetNumber.value) {
         level.value++;
         Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
         Get.find<SoundController>().playSuccess();
+        Get.find<AdsController>().onLevelCompleted();
 
         _updateLeaderboard();
         _checkAchievements();
 
-        // Level Up Dialog
-        if (Get.isDialogOpen ?? false) return;
-        Get.dialog(
-          AlertDialog(
-            title: const Text("✅ Level Up!"),
-            content: const Text("You reached the target!"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Get.back(); // close dialog
-                  generateNewLevel();
-                },
-                child: const Text("Next Level"),
-              )
-            ],
-          ),
-          barrierDismissible: false,
-        );
+        // Level Up Logic handled by view observing isGameWon
+        isGameWon.value = true;
       } else {
         // Game Over
         isGameOver.value = true;
@@ -173,6 +160,14 @@ class MathMazeController extends GetxController {
 
   void skipLevel() {
     level.value++;
+    generateNewLevel();
+    Get.snackbar("⏭️ Skipped!", "Moving to Level ${level.value}",
+        snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 1));
+  }
+
+  void startGame() {
+    Get.find<CurrencyController>().resetSession();
+    level.value = 1;
     generateNewLevel();
     Get.snackbar("⏭️ Skipped!", "Moving to Level ${level.value}",
         snackPosition: SnackPosition.TOP, duration: const Duration(seconds: 1));

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/utils/app_colors.dart';
-import 'package:flutter_omath/utils/consts.dart';
 
 class BuildGameOption extends StatelessWidget {
   const BuildGameOption({

@@ -1,25 +1,27 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class ArrangeNumberController extends GetxController implements GetxService {
   final level = 1.obs;
-  final timer = 30.obs;
+  final lives = 3.obs;
+  final extraLivesGained = 0.obs;
+  final userAnswerTap = 0.obs;
   final score = 0.obs;
   final questionNumbers = <int>[].obs;
   final userSelection = <int>[].obs;
   final isDescending = false.obs;
   final isGameOver = false.obs;
 
-  Timer? _gameTimer;
   Timer? _freezeTimer;
   final _rng = Random();
 
@@ -29,26 +31,14 @@ class ArrangeNumberController extends GetxController implements GetxService {
   List<int> _correctOrder = [];
 
   void startGame() {
+    Get.find<CurrencyController>().resetSession();
     level.value = 1;
-    timer.value = 30;
+    lives.value = 3;
+    extraLivesGained.value = 0;
+    userAnswerTap.value = 0;
     score.value = 0;
     isGameOver.value = false;
     generateNewRound();
-    startTimer();
-  }
-
-  void startTimer() {
-    _gameTimer?.cancel();
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (isTimeFrozen.value) return;
-
-      if (timer.value == 0) {
-        t.cancel();
-        onTimeOut();
-      } else {
-        timer.value--;
-      }
-    });
   }
 
   void generateNewRound() {
@@ -80,9 +70,6 @@ class ArrangeNumberController extends GetxController implements GetxService {
     if (isDescending.value) {
       _correctOrder = _correctOrder.reversed.toList();
     }
-
-    int timeForLevel = 15 + (count * 3);
-    timer.value = timeForLevel;
   }
 
   void selectNumber(int num) {
@@ -100,6 +87,8 @@ class ArrangeNumberController extends GetxController implements GetxService {
   }
 
   void checkAnswer() {
+    userAnswerTap.value++;
+
     List<int> expected = List.from(questionNumbers);
     expected.sort();
     if (isDescending.value) {
@@ -119,6 +108,10 @@ class ArrangeNumberController extends GetxController implements GetxService {
       Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
       Get.find<SoundController>().playSuccess();
 
+      if (userAnswerTap.value % 2 == 0) {
+        Get.find<AdsController>().showInterstitialAd();
+      }
+
       _updateLeaderboard();
       _checkAchievements();
 
@@ -131,9 +124,39 @@ class ArrangeNumberController extends GetxController implements GetxService {
     } else {
       userSelection.clear();
       Get.find<SoundController>().playWrong();
-      Get.snackbar("❌ Wrong Order!", "Try again!",
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(seconds: 1));
+
+      if (userAnswerTap.value % 2 == 0) {
+        Get.find<AdsController>().showInterstitialAd();
+      }
+
+      lives.value--;
+      if (lives.value <= 0) {
+        isGameOver.value = true;
+      }
+
+      if (!isGameOver.value) {
+        Get.snackbar("❌ Wrong Order!", "Try again! Lives: ${lives.value}",
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 1));
+      }
+    }
+  }
+
+  void solveLevel() {
+    score.value += 10 * level.value;
+    level.value++;
+    Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+    Get.find<SoundController>().playSuccess();
+    Get.find<AdsController>().showInterstitialAd();
+    generateNewRound();
+  }
+
+  void addExtraLife() {
+    if (extraLivesGained.value < 2) {
+      lives.value++;
+      extraLivesGained.value++;
+      Fluttertoast.showToast(
+          msg: "Extra Life Added! (${extraLivesGained.value}/2)");
     }
   }
 
@@ -163,12 +186,6 @@ class ArrangeNumberController extends GetxController implements GetxService {
     }
   }
 
-  void onTimeOut() {
-    if (isClosed) return;
-    isGameOver.value = true;
-    Get.find<SoundController>().playWrong();
-  }
-
   void freezeTime() {
     if (isTimeFrozen.value) return;
 
@@ -193,7 +210,6 @@ class ArrangeNumberController extends GetxController implements GetxService {
   }
 
   void disposeGame() {
-    _gameTimer?.cancel();
     _freezeTimer?.cancel();
   }
 

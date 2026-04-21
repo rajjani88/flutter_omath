@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class TrueFalseGame extends StatefulWidget {
   const TrueFalseGame({super.key});
@@ -79,7 +80,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                             GameColors.secondary),
                         const CoinDisplayWidget(),
                         _buildHUDChip(
-                            "TIME", "${controller.timer}s", GameColors.danger),
+                            "LIVES", "${controller.lives}", GameColors.danger),
                       ],
                     )),
               ),
@@ -176,11 +177,27 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                               ],
                             )),
                       ),
+                      const SizedBox(height: 20),
+
                       // Power-Up Bar
-                      GamePowerUpBar(
-                        onHint: () => controller.useHint(),
-                        onFreeze: () => controller.freezeTime(),
-                        onSkip: () => controller.skipLevel(),
+                      Obx(() => GamePowerUpBar(
+                            onHint: () => controller.useHint(),
+                            onFreeze: () {}, // No timer
+                            onSkip: () => controller.skipLevel(),
+                            onSolve: () => controller.solveLevel(),
+                            onAddLife: () => controller.addExtraLife(),
+                            showFreeze: false,
+                            showSolve: true,
+                            showAddLife: controller.extraLivesGained.value < 2,
+                          )),
+                      const SizedBox(height: 20),
+
+                      Obx(
+                        () => adsController.isBannerAd3Loaded.value
+                            ? SizedBox(
+                                height: AdSize.banner.height.toDouble(),
+                                child: AdWidget(ad: adsController.bannerAd3!))
+                            : const SizedBox.shrink(),
                       ),
                       const SizedBox(height: 20),
                     ],
@@ -194,7 +211,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
               return Positioned.fill(
                 child: GameResultPopup(
                   score: controller.score.value,
-                  isTimeUp: true,
+                  isTimeUp: false,
                   onRetry: () {
                     // Logic for retry
                     if (!purchaseController.isPro.value) {

@@ -1,28 +1,33 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class TrueFalseGameController extends GetxController {
   final level = 1.obs;
   final score = 0.obs;
-  final timer = 30.obs;
+  final lives = 3.obs;
+  final extraLivesGained = 0.obs;
   final question = ''.obs;
   final isCorrectAnswer = true.obs;
   final isGameOver = false.obs;
 
-  Timer? _gameTimer;
   Timer? _freezeTimer;
   final _rng = Random();
 
   // Power-Up States
   RxBool isTimeFrozen = false.obs;
   RxBool showHint = false.obs;
+
+  //user answere tap
+  RxInt userAnswerTap = 0.obs;
 
   @override
   void onInit() {
@@ -31,28 +36,13 @@ class TrueFalseGameController extends GetxController {
   }
 
   void startGame() {
+    Get.find<CurrencyController>().resetSession();
     level.value = 1;
     score.value = 0;
-    timer.value = 30;
+    lives.value = 3;
+    extraLivesGained.value = 0;
     isGameOver.value = false;
     generateQuestion();
-    startTimer();
-  }
-
-  void startTimer() {
-    _gameTimer?.cancel();
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (t) {
-      // Don't decrement if frozen
-      if (isTimeFrozen.value) return;
-
-      if (timer.value == 0) {
-        t.cancel();
-        isGameOver.value = true;
-        Get.find<SoundController>().playWrong();
-      } else {
-        timer.value--;
-      }
-    });
   }
 
   void generateQuestion() {
@@ -99,23 +89,57 @@ class TrueFalseGameController extends GetxController {
   void onAnswer(bool userSaysTrue) {
     if (isGameOver.value) return;
 
+    userAnswerTap.value++;
+
     if (userSaysTrue == isCorrectAnswer.value) {
       score.value += 10;
       level.value++;
       // Award coins
       Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
       Get.find<SoundController>().playSuccess();
+      if (userAnswerTap.value % 2 == 0) {
+        print("interstial ad show ${userAnswerTap.value}");
+
+        Get.find<AdsController>().showInterstitialAd();
+      }
 
       // Future Integrations
       _updateLeaderboard();
       _checkAchievements();
     } else {
+      //when user play wrong
+      if (userAnswerTap.value % 2 == 0) {
+        print("interstial ad show ${userAnswerTap.value}");
+
+        Get.find<AdsController>().showInterstitialAd();
+      }
       Get.find<SoundController>().playWrong();
-      timer.value = max(timer.value - 5, 0);
+      lives.value--;
+      if (lives.value <= 0) {
+        isGameOver.value = true;
+      }
     }
 
-    if (timer.value > 0) {
+    if (!isGameOver.value) {
       generateQuestion();
+    }
+  }
+
+  void solveLevel() {
+    score.value += 10;
+    level.value++;
+    Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
+    Get.find<SoundController>().playSuccess();
+    Get.find<AdsController>().onLevelCompleted();
+    generateQuestion();
+  }
+
+  void addExtraLife() {
+    if (extraLivesGained.value < 2) {
+      lives.value++;
+      extraLivesGained.value++;
+      Fluttertoast.showToast(
+          msg: "Extra Life Added! (${extraLivesGained.value}/2)");
     }
   }
 
@@ -157,7 +181,6 @@ class TrueFalseGameController extends GetxController {
 
   @override
   void onClose() {
-    _gameTimer?.cancel();
     _freezeTimer?.cancel();
     super.onClose();
   }

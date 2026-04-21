@@ -32,22 +32,6 @@ class AppConfig {
   // --- GAMEPLAY CONSTANTS ---
   static const int dailyChallengeTargetLevel = 5;
 
-  // --- ADS CONFIGURATION (AdMob) ---
-  // Replace these with REAL IDs for production
-  static const String admobAppIdAndroid =
-      "ca-app-pub-3940256099942544~3347511713";
-  static const String admobAppIdIos = "ca-app-pub-3940256099942544~1458002511";
-
-  static const String bannerAdUnitIdAndroid =
-      "ca-app-pub-3940256099942544/6300978111"; // Test ID
-  static const String bannerAdUnitIdIos =
-      "ca-app-pub-3940256099942544/2934735716"; // Test ID
-
-  static const String rewardedAdUnitIdAndroid =
-      "ca-app-pub-3940256099942544/5224354917"; // Test ID
-  static const String rewardedAdUnitIdIos =
-      "ca-app-pub-3940256099942544/1712485313"; // Test ID
-
   static const String imgLogo = "assets/images/logo.png";
   static const String imgLogoTr = "assets/images/logo_tr.png"; // Fixed path
   static const String imgNumber = "assets/images/number.png";

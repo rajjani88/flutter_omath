@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -39,6 +39,7 @@ class CalculateNumbersController extends GetxController implements GetxService {
 
   void startGame(OperationMode selectedMode,
       {int? seed, bool isDaily = false}) {
+    Get.find<CurrencyController>().resetSession();
     isDailyChallenge = isDaily;
     if (seed != null) {
       _rng = Random(seed);
@@ -88,21 +89,21 @@ class CalculateNumbersController extends GetxController implements GetxService {
     OperationMode currentMode = mode.value;
     if (currentMode == OperationMode.auto) {
       // Difficulty Flow
-      if (lvl <= 4)
+      if (lvl <= 4) {
         currentMode = OperationMode.add;
-      else if (lvl <= 8)
+      } else if (lvl <= 8) {
         currentMode = OperationMode.subtract;
-      else if (lvl <= 12)
+      } else if (lvl <= 12) {
         currentMode = OperationMode.multiply;
-      else {
+      } else {
         int r = _rng!.nextInt(100);
-        if (r < 40)
+        if (r < 40) {
           currentMode = OperationMode.add;
-        else if (r < 70)
+        } else if (r < 70) {
           currentMode = OperationMode.subtract;
-        else
-          currentMode =
-              OperationMode.multiply; // Division is hard on phone keypad
+        } else {
+          currentMode = OperationMode.multiply;
+        }
       }
     }
 
@@ -174,6 +175,7 @@ class CalculateNumbersController extends GetxController implements GetxService {
       // Award coins for correct answer
       Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
       Get.find<SoundController>().playSuccess();
+      Get.find<AdsController>().onLevelCompleted();
 
       // Future Integrations
       _updateLeaderboard();

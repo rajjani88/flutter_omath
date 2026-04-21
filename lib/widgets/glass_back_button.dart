@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +13,7 @@ class GlassBackButton extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         try {
+          Get.find<AdsController>().showInterstitialAd();
           Get.find<SoundController>().playClick();
         } catch (e) {
           // Ignore sound error

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
-import 'package:flutter_omath/controllers/calculate_numbers_contoller.dart';
-import 'package:flutter_omath/screens/calculate_numbers/calculate_numbers_screens.dart';
+import 'package:flutter_omath/screens/math_grid/math_grid_find_number_screen.dart';
+import 'package:flutter_omath/screens/sudoku/sudoku_screen.dart';
 import 'package:get/get.dart';
 
 class DailyChallengeCard extends StatelessWidget {
@@ -89,11 +89,21 @@ class DailyChallengeCard extends StatelessWidget {
                   onPressed: () {
                     // Navigate to game with Seed
                     int seed = controller.getDailySeed();
-                    Get.to(() => CalculateNumbersScreen(
-                          selectedMode: OperationMode.auto,
-                          isDailyChallenge: true,
-                          dailySeed: seed,
-                        ));
+                    int gameMode = controller.getDailyGameMode();
+
+                    if (gameMode == 0) {
+                      // Math Grid
+                      Get.to(() => MathGridFindNumber(
+                            isDailyChallenge: true,
+                            dailySeed: seed,
+                          ));
+                    } else {
+                      // Sudoku
+                      Get.to(() => SudokuScreen(
+                            isDailyChallenge: true,
+                            dailySeed: seed,
+                          ));
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,

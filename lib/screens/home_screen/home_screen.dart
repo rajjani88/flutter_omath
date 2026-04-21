@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/ads_contoller.dart';
@@ -13,10 +12,10 @@ import 'package:flutter_omath/screens/settings/settings_screen.dart';
 import 'package:flutter_omath/screens/leaderboard/leaderboard_screen.dart';
 import 'package:flutter_omath/screens/achievements/achievements_screen.dart';
 import 'package:flutter_omath/screens/math_grid/math_grid_find_number_screen.dart';
-import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 
 import 'package:flutter_omath/screens/math_maze/math_maze_view.dart';
 import 'package:flutter_omath/screens/profile/profile_screen.dart';
+import 'package:flutter_omath/screens/sudoku/sudoku_screen.dart';
 import 'package:flutter_omath/screens/true_false/true_false_game_screen.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:get/get.dart';
@@ -87,6 +86,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+  void _launchDailyChallenge() {
+    final dailyController = Get.find<DailyChallengeController>();
+    int seed = dailyController.getDailySeed();
+    int gameMode = dailyController.getDailyGameMode();
+
+    if (gameMode == 0) {
+      Get.to(() => MathGridFindNumber(
+            isDailyChallenge: true,
+            dailySeed: seed,
+          ));
+    } else {
+      Get.to(() => SudokuScreen(
+            isDailyChallenge: true,
+            dailySeed: seed,
+          ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Theme Colors
@@ -102,6 +119,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "color": const Color(0xFF34d399), // Mint Green
         "icon": Icons.grid_3x3,
         "onTap": () => Get.to(() => const MathGridFindNumber())
+      },
+      {
+        "title": "Mini Sudoku",
+        "desc": "Solve the 6x6 grid",
+        "color": const Color(0xFFfb923c), // Orange
+        "icon": Icons.grid_on_rounded,
+        "onTap": () => Get.to(() => const SudokuScreen())
       },
       {
         "title": "True or False",
@@ -310,24 +334,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         // --- Daily Streak Section ---
                         // DailyStreakCard(userController: userController),
                         Obx(() => StreakHomeCard(
-                              streakCount: userController.loginStreak.value,
+                              streakCount: dailyController.currentStreak.value,
                               onTap: () =>
                                   _onTabSelected('games'), // Go to Achievements
                               isCompleted:
                                   dailyController.isTodayCompleted.value,
                               onPlay: () {
                                 adsController.showRewardedAd(
-                                  onRewardGranted: () {
-                                    int seed = dailyController.getDailySeed();
-                                    Get.to(() => CalculateNumbersScreen(
-                                        selectedMode: OperationMode.auto,
-                                        isDailyChallenge: true,
-                                        dailySeed: seed));
-                                  },
+                                  onRewardGranted: () =>
+                                      _launchDailyChallenge(),
                                 );
                               },
                             )),
 
+                        SizedBox(height: 12.h),
+                        Obx(
+                          () => adsController.isBannerAdLoaded.value
+                              ? SizedBox(
+                                  height: AdSize.banner.height.toDouble(),
+                                  child: AdWidget(ad: adsController.bannerAd!))
+                              : const SizedBox.shrink(),
+                        ),
                         SizedBox(height: 12.h),
 
                         // --- Game Modes ---
@@ -370,15 +397,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               onTap: mode['onTap'],
                             );
                           },
-                        ),
-
-                        SizedBox(height: 14.h),
-                        Obx(
-                          () => adsController.isBannerAdLoaded.value
-                              ? SizedBox(
-                                  height: AdSize.banner.height.toDouble(),
-                                  child: AdWidget(ad: adsController.bannerAd!))
-                              : const SizedBox.shrink(),
                         ),
 
                         SizedBox(height: 14.h),
@@ -687,11 +705,9 @@ class DailyStreakCard extends StatelessWidget {
           Get.find<SoundController>().playClick();
           if (!isCompleted) {
             // Start Daily Challenge
-            Get.to(() => CalculateNumbersScreen(
-                  selectedMode: OperationMode.auto,
-                  isDailyChallenge: true,
-                  dailySeed: dailyController.getDailySeed(),
-                ));
+            (context.findAncestorStateOfType<_HomeScreenState>()
+                    as _HomeScreenState)
+                ._launchDailyChallenge();
           } else {
             // View Achievements
             Get.to(() => const AchievementsScreen());

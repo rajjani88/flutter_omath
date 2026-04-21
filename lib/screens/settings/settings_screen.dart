@@ -101,8 +101,7 @@ class SettingsScreen extends StatelessWidget {
                   label: "Privacy Policy",
                   icon: Icons.privacy_tip_outlined,
                   onTap: () async {
-                    const url =
-                        'https://sites.google.com/view/brainy-math-app/privacy-policy'; // From consts.dart if available
+                    const url = AppConfig.privacyPolicyUrl;
                     if (!await launchUrl(Uri.parse(url))) {
                       Get.snackbar("Error", "Could not launch URL");
                     }
@@ -113,8 +112,8 @@ class SettingsScreen extends StatelessWidget {
                   label: "Terms & Conditions",
                   icon: Icons.description_outlined,
                   onTap: () async {
-                    const url =
-                        'https://sites.google.com/view/brainy-math-app/terms-and-conditions';
+                    const url = AppConfig.termsUrl;
+
                     if (!await launchUrl(Uri.parse(url))) {
                       Get.snackbar("Error", "Could not launch URL");
                     }
@@ -125,8 +124,8 @@ class SettingsScreen extends StatelessWidget {
                   label: "Rate Us",
                   icon: Icons.star_rate_rounded,
                   onTap: () async {
-                    final Uri marketUri = Uri.parse(urlRateUs);
-                    final Uri webUri = Uri.parse(urlRateUsWeb);
+                    final Uri marketUri = Uri.parse(AppConfig.rateUsUrl);
+                    final Uri webUri = Uri.parse(AppConfig.rateUsWebUrl);
 
                     if (await canLaunchUrl(marketUri)) {
                       await launchUrl(marketUri,

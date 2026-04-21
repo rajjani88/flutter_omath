@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/ads_contoller.dart';
+import 'package:flutter_omath/controllers/currency_controller.dart';
+import 'package:flutter_omath/widgets/juicy_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -197,6 +199,28 @@ class _GameResultPopupState extends State<GameResultPopup>
                       ),
                     ),
                     const SizedBox(height: 32),
+
+                    // Double Session Reward Button
+                    Obx(() {
+                      final cc = Get.find<CurrencyController>();
+                      if (cc.sessionCoins.value > 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: JuicyButton(
+                            label: "DOUBLE (+${cc.sessionCoins.value} 🪙)",
+                            icon: Icons.play_circle_fill,
+                            onTap: () {
+                              Get.find<AdsController>().showRewardedAd(
+                                onRewardGranted: () => cc.doubleSessionCoins(),
+                              );
+                            },
+                            color: const Color(0xFF6366f1), // Indigo
+                            height: 50,
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
 
                     // Retry Button
                     Container(

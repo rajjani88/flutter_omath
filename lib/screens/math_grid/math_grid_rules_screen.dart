@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/screens/math_grid/math_grid_find_number_screen.dart';
 import 'package:flutter_omath/utils/app_colors.dart';
 import 'package:flutter_omath/utils/consts.dart';
@@ -86,8 +87,9 @@ class _MathGridRulesScreenState extends State<MathGridRulesScreen> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14))),
                       onPressed: () {
+                        Get.find<AdsController>().showInterstitialAd();
                         Get.back();
-                        Get.to(() => MathGridFindNumber());
+                        Get.to(() => const MathGridFindNumber());
                       },
                       child: const Padding(
                         padding: EdgeInsets.all(14.0),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
+import 'package:flutter_omath/widgets/reward_choice_dialog.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,6 +13,7 @@ class PowerUpButton extends StatefulWidget {
   final int cost;
   final VoidCallback onActivate;
   final Color color;
+  final String description;
 
   const PowerUpButton({
     super.key,
@@ -21,6 +22,7 @@ class PowerUpButton extends StatefulWidget {
     required this.cost,
     required this.onActivate,
     this.color = GameColors.secondary,
+    this.description = "How would you like to pay?",
   });
 
   @override
@@ -52,63 +54,16 @@ class _PowerUpButtonState extends State<PowerUpButton>
   }
 
   void _handleTap() {
-    final currencyController = Get.find<CurrencyController>();
-    final soundController = Get.find<SoundController>();
-
-    if (currencyController.spendCoins(widget.cost)) {
-      // Success - play sound and activate
-      soundController.playSuccess();
-      widget.onActivate();
-    } else {
-      // Not enough coins - show dialog
-      soundController.playWrong();
-      _showNotEnoughCoinsDialog();
-    }
-  }
-
-  void _showNotEnoughCoinsDialog() {
     Get.dialog(
-      AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        backgroundColor: GameColors.panel,
-        title: Text(
-          "💰 Not Enough Coins!",
-          style: GoogleFonts.fredoka(color: Colors.white, fontSize: 22.sp),
-          textAlign: TextAlign.center,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "You need ${widget.cost} coins for this power-up.",
-              style: GoogleFonts.nunito(color: Colors.white70, fontSize: 16.sp),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20.h),
-            ElevatedButton.icon(
-              onPressed: () {
-                Get.back();
-                Get.find<CurrencyController>().watchAdForCoins();
-              },
-              icon: const Icon(Icons.play_circle_fill),
-              label: Text("Watch Ad (+100 🪙)", style: GoogleFonts.nunito()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GameColors.success,
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r)),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text("Cancel",
-                style: GoogleFonts.nunito(color: Colors.white60)),
-          ),
-        ],
+      RewardChoiceDialog(
+        title: widget.label,
+        icon: widget.icon,
+        coinCost: widget.cost,
+        description: widget.description,
+        onConfirm: () {
+          Get.find<SoundController>().playSuccess();
+          widget.onActivate();
+        },
       ),
     );
   }
@@ -165,10 +120,11 @@ class _PowerUpButtonState extends State<PowerUpButton>
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Text(
-                  "${widget.cost} 🪙",
+                  widget.cost > 0 ? "${widget.cost} 🪙" : "Watch ▶️",
                   style: GoogleFonts.fredoka(
                     color: Colors.amber,
-                    fontSize: 12.sp,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

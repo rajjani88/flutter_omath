@@ -11,7 +11,7 @@ import 'package:flutter_omath/widgets/glass_icon_button.dart'; // Add this
 import 'package:flutter_omath/widgets/game_bottom_bar.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_omath/widgets/game_result_popup.dart';
+import 'package:flutter_omath/widgets/unified_success_popup.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 
 class MathMazeView extends StatelessWidget {
@@ -217,22 +217,16 @@ class MathMazeView extends StatelessWidget {
               ),
             ],
           ),
-          Obx(() => controller.isGameOver.value
-              ? Positioned.fill(
-                  child: GameResultPopup(
-                    score: (controller.level.value - 1) *
-                        10, // Approx score logic or just 0
-                    isTimeUp:
-                        false, // It's moves up, but we can reuse the generic look or adjust text if needed. The popup says "Time's Up" by default if isTimeUp is true. If false, it says "Game Over".
-                    // Wait, GameResultPopup checks isTimeUp for title.
-                    // If isTimeUp is true -> "Time's Up!".
-                    // If isTimeUp is false -> "Wrong Answer!".
-                    // Here it's "Out of Moves" effectively. I'll define isTimeUp=true for now as it's closer to "resource ran out".
-                    // Or I can modify GameResultPopup later to take a custom title.
-                    // For now, I'll pass isTimeUp: true for consistency with "run out of resources".
-                    onRetry: () => controller.generateNewLevel(),
-                    onHome: () => Get.offAll(() => const HomeScreen()),
-                  ),
+          Obx(() => controller.isGameWon.value
+              ? UnifiedSuccessPopup(
+                  coins: controller.rewardedCoins,
+                  xp: 15,
+                  level: "${controller.level.value - 1}",
+                  onNext: () {
+                    controller.isGameWon.value = false;
+                    controller.generateNewLevel();
+                  },
+                  onHome: () => Get.offAll(() => const HomeScreen()),
                 )
               : const SizedBox.shrink()),
         ],

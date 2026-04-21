@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/widgets/glass_card.dart';
 import 'package:flutter_omath/widgets/juicy_button.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DailyChallengeSuccessPopup extends StatefulWidget {

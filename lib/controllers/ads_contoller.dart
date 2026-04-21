@@ -2,6 +2,7 @@ import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
+import 'package:flutter_omath/utils/ads_const.dart';
 
 class AdsController extends GetxController implements GetxService {
   // Ad instances
@@ -17,14 +18,8 @@ class AdsController extends GetxController implements GetxService {
   // Counters
   var totalAdsShown = 0.obs;
   var coinsEarnedFromAds = 0.obs;
+  var levelsCompleted = 0.obs;
 
-  // Ad unit IDs (replace these with your AdMob ad unit IDs)
-  final String bannerAdUnitId = "ca-app-pub-4035340144253699/2171011928"; //live
-  final String interstitialAdUnitId =
-      "ca-app-pub-4035340144253699/3644709841"; //live
-  final String rewardedAdUnitId =
-      //  "ca-app-pub-3940256099942544/5224354917"; //test
-      "ca-app-pub-4035340144253699/4437673496"; //live
 
   BannerAd? bannerAd1;
   BannerAd? bannerAd2;
@@ -34,11 +29,7 @@ class AdsController extends GetxController implements GetxService {
   var isBannerAd1Loaded = false.obs;
   var isBannerAd2Loaded = false.obs;
   var isBannerAd3Loaded = false.obs;
-
-  // Ad unit IDs (replace these with your AdMob ad unit IDs)
-  final String bannerAdUnitId1 = ""; //live
-  final String bannerAdUnitId2 = ""; //live
-  final String bannerAdUnitId3 = "";
+  var isBannerAd4Loaded = false.obs;
 
   final Sharedprefs sp;
 
@@ -47,9 +38,10 @@ class AdsController extends GetxController implements GetxService {
   @override
   void onInit() {
     super.onInit();
-    // _loadBannerAd1();
-    // _loadBannerAd2();
-    // _loadBannerAd3();
+    _loadBannerAd1();
+    _loadBannerAd2();
+    _loadBannerAd3();
+    _loadBannerAd4();
     _loadBannerAd();
     _loadInterstitialAd();
     _loadRewardedAd();
@@ -58,7 +50,7 @@ class AdsController extends GetxController implements GetxService {
   // Load Banner Ad
   void _loadBannerAd() {
     bannerAd = BannerAd(
-      adUnitId: bannerAdUnitId,
+      adUnitId: AdConstants.bannerAdUnitId,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -78,7 +70,7 @@ class AdsController extends GetxController implements GetxService {
   // Load Banner Ad 1
   void _loadBannerAd1() {
     bannerAd1 = BannerAd(
-      adUnitId: bannerAdUnitId1,
+      adUnitId: AdConstants.bannerNumberGrid,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -97,7 +89,7 @@ class AdsController extends GetxController implements GetxService {
   // Load Banner Ad 2
   void _loadBannerAd2() {
     bannerAd2 = BannerAd(
-      adUnitId: bannerAdUnitId2,
+      adUnitId: AdConstants.miniSudokuBanner,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -116,7 +108,7 @@ class AdsController extends GetxController implements GetxService {
   // Load Banner Ad 3
   void _loadBannerAd3() {
     bannerAd3 = BannerAd(
-      adUnitId: bannerAdUnitId3,
+      adUnitId: AdConstants.trueFalseBanner,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -135,7 +127,7 @@ class AdsController extends GetxController implements GetxService {
 // Load Interstitial Ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
-      adUnitId: interstitialAdUnitId,
+      adUnitId: AdConstants.interstitialAdUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
@@ -169,7 +161,7 @@ class AdsController extends GetxController implements GetxService {
   // Load Rewarded Ad
   void _loadRewardedAd() {
     RewardedAd.load(
-      adUnitId: rewardedAdUnitId,
+      adUnitId: AdConstants.rewardedAdUnitId,
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
@@ -235,6 +227,15 @@ class AdsController extends GetxController implements GetxService {
     }
   }
 
+  /// Trigger every 2 level completions
+  void onLevelCompleted() {
+    levelsCompleted.value++;
+    if (levelsCompleted.value >= 2) {
+      levelsCompleted.value = 0;
+      showInterstitialAd();
+    }
+  }
+
   // Dispose resources
   @override
   void onClose() {
@@ -245,6 +246,27 @@ class AdsController extends GetxController implements GetxService {
     bannerAd1?.dispose();
     bannerAd2?.dispose();
     bannerAd3?.dispose();
+    bannerAd4?.dispose();
     super.onClose();
+  }
+
+  BannerAd? bannerAd4;
+
+  void _loadBannerAd4() {
+    bannerAd4 = BannerAd(
+      adUnitId: AdConstants.arrangeItBanner,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          isBannerAd4Loaded.value = true;
+        },
+        onAdFailedToLoad: (ad, error) {
+          isBannerAd4Loaded.value = false;
+          ad.dispose();
+          print("Banner Ad 4 failed to load: $error");
+        },
+      ),
+    )..load();
   }
 }

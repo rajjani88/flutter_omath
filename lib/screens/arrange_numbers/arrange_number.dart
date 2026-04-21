@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_omath/widgets/game_bottom_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_omath/controllers/arrange_number_contoller.dart';
@@ -9,9 +10,10 @@ import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/game_button.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:flutter_omath/widgets/glass_icon_button.dart'; // Add this
-import 'package:flutter_omath/widgets/game_bottom_bar.dart';
+import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 
@@ -25,6 +27,7 @@ class ArrangeNumber extends StatefulWidget {
 class _ArrangeNumberState extends State<ArrangeNumber> {
   final ArrangeNumberController controller = Get.find();
   final SoundController soundController = Get.find<SoundController>();
+  final AdsController adsController = Get.find<AdsController>();
 
   @override
   void initState() {
@@ -89,7 +92,7 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
                           _buildHUDChip("LEVEL", "${controller.level.value}",
                               GameColors.secondary),
                           const CoinDisplayWidget(),
-                          _buildHUDChip("TIME", "${controller.timer.value}s",
+                          _buildHUDChip("LIVES", "${controller.lives.value}",
                               GameColors.danger),
                         ],
                       ),
@@ -242,10 +245,23 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
                       ),
                     ),
                     // Power-Up Bar
-                    GamePowerUpBar(
-                      onHint: () => controller.useHint(),
-                      onFreeze: () => controller.freezeTime(),
-                      onSkip: () => controller.skipLevel(),
+                    Obx(() => GamePowerUpBar(
+                          onHint: () => controller.useHint(),
+                          onFreeze: () {}, // No timer
+                          onSkip: () => controller.skipLevel(),
+                          onSolve: () => controller.solveLevel(),
+                          onAddLife: () => controller.addExtraLife(),
+                          showFreeze: false,
+                          showSolve: true,
+                          showAddLife: controller.extraLivesGained.value < 2,
+                        )),
+                    const SizedBox(height: 10),
+                    Obx(
+                      () => adsController.isBannerAd4Loaded.value
+                          ? SizedBox(
+                              height: AdSize.banner.height.toDouble(),
+                              child: AdWidget(ad: adsController.bannerAd4!))
+                          : const SizedBox.shrink(),
                     ),
                     const SizedBox(height: 20),
                   ],
@@ -258,7 +274,7 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
               return Positioned.fill(
                 child: GameResultPopup(
                   score: controller.score.value,
-                  isTimeUp: true,
+                  isTimeUp: false,
                   onRetry: () {
                     controller.startGame();
                   },
