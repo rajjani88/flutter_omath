@@ -119,7 +119,7 @@ class _FloatingSymbolWidgetState extends State<_FloatingSymbolWidget>
               opacity: 0.1,
               child: Text(
                 widget.symbol.char,
-                style: GoogleFonts.quicksand(
+                style: GoogleFonts.outfit(
                   fontSize: 10 + widget.symbol.speed * 10,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,

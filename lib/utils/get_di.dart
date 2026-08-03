@@ -1,5 +1,4 @@
 import 'package:flutter_omath/controllers/achievement_controller.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/controllers/arrange_number_contoller.dart';
@@ -29,7 +28,6 @@ Future<void> init() async {
   Get.lazyPut(() => SudokuController(), fenix: true);
 
   // Core App Controllers
-  Get.lazyPut(() => AdsController(sp: Get.find()), fenix: true);
   Get.lazyPut(() => InAppPurchaseController(sp: Get.find()), fenix: true);
   Get.lazyPut(() => SoundController(), fenix: true);
   Get.lazyPut(() => CurrencyController(), fenix: true);

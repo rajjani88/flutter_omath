@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:flutter_omath/widgets/glass_card.dart'; // New Import
 import 'package:flutter_omath/widgets/floating_background.dart'; // New Import
@@ -23,34 +22,6 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   final AchievementController achievementController =
       Get.find<AchievementController>();
 
-  // Theme Colors
-
-  final AdsController adsController = Get.find<AdsController>();
-  Timer? _adsTimer;
-
-  void showAds() {
-    if (_adsTimer != null) {
-      return;
-    }
-    log('timer is started');
-    _adsTimer = Timer(const Duration(seconds: 13), () {
-      adsController.showInterstitialAd();
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    showAds();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    _adsTimer?.cancel();
-  }
-
   @override
   Widget build(BuildContext context) {
     Color bgStart = const Color(0xFF2d1b4e);
@@ -67,7 +38,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         leading: Center(child: GlassBackButton(onTap: () => Get.back())),
         title: Text(
           "Achievements",
-          style: GoogleFonts.quicksand(
+          style: GoogleFonts.outfit(
               fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
@@ -105,7 +76,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 // Section Header
                 Text(
                   "BADGES",
-                  style: GoogleFonts.quicksand(
+                  style: GoogleFonts.outfit(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFC084FC),
@@ -141,7 +112,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
           padding: const EdgeInsets.only(left: 8, bottom: 8),
           child: Text(
             category.toUpperCase(),
-            style: GoogleFonts.quicksand(
+            style: GoogleFonts.outfit(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.white38,
@@ -216,7 +187,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
               children: [
                 Text(
                   achievement.name,
-                  style: GoogleFonts.quicksand(
+                  style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: isUnlocked ? Colors.white : Colors.white38,
@@ -225,7 +196,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 const SizedBox(height: 4),
                 Text(
                   achievement.description,
-                  style: GoogleFonts.quicksand(
+                  style: GoogleFonts.outfit(
                     fontSize: 12,
                     color: isUnlocked ? Colors.white70 : Colors.white24,
                   ),
@@ -239,7 +210,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                     children: [
                       Text(
                         "${achievement.currentValue.value} / ${achievement.targetValue}",
-                        style: GoogleFonts.quicksand(
+                        style: GoogleFonts.outfit(
                           fontSize: 10,
                           color: Colors.white54,
                           fontWeight: FontWeight.w600,

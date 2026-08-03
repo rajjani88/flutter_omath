@@ -102,7 +102,7 @@ class _DailyChallengeSuccessPopupState
 
                 Text(
                   "You kept the flame alive!",
-                  style: GoogleFonts.quicksand(
+                  style: GoogleFonts.outfit(
                     fontSize: 14,
                     color: Colors.white70,
                     fontWeight: FontWeight.bold,
@@ -129,7 +129,7 @@ class _DailyChallengeSuccessPopupState
                         children: [
                           Text(
                             "DAILY STREAK",
-                            style: GoogleFonts.quicksand(
+                            style: GoogleFonts.outfit(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.orangeAccent,
@@ -137,7 +137,7 @@ class _DailyChallengeSuccessPopupState
                           ),
                           Text(
                             "${widget.streak} DAYS",
-                            style: GoogleFonts.quicksand(
+                            style: GoogleFonts.outfit(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,

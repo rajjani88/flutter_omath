@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/widgets/juicy_button.dart';
 import 'package:get/get.dart';
@@ -145,7 +144,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                     // Texts
                     Text(
                       "OOPS!",
-                      style: GoogleFonts.quicksand(
+                      style: GoogleFonts.outfit(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
@@ -157,7 +156,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                       widget.isTimeUp
                           ? "Time's up!"
                           : "That wasn't quite right.",
-                      style: GoogleFonts.quicksand(
+                      style: GoogleFonts.outfit(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Colors.white70,
@@ -180,7 +179,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                         children: [
                           Text(
                             "CURRENT SCORE",
-                            style: GoogleFonts.quicksand(
+                            style: GoogleFonts.outfit(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.white54,
@@ -189,7 +188,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                           const SizedBox(width: 12),
                           Text(
                             "⭐ ${widget.score}",
-                            style: GoogleFonts.quicksand(
+                            style: GoogleFonts.outfit(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.yellow.shade400,
@@ -210,9 +209,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                             label: "DOUBLE (+${cc.sessionCoins.value} 🪙)",
                             icon: Icons.play_circle_fill,
                             onTap: () {
-                              Get.find<AdsController>().showRewardedAd(
-                                onRewardGranted: () => cc.doubleSessionCoins(),
-                              );
+                              cc.doubleSessionCoins();
                             },
                             color: const Color(0xFF6366f1), // Indigo
                             height: 50,
@@ -242,18 +239,12 @@ class _GameResultPopupState extends State<GameResultPopup>
                         borderRadius: BorderRadius.circular(16),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            // Add a small delay to show ripple
-                            Future.delayed(const Duration(milliseconds: 150),
-                                () {
-                              Get.find<AdsController>().showRewardedAd(
-                                onRewardGranted: () {
-                                  // Retry after ad
-                                  widget.onRetry();
-                                },
-                              );
-                            });
-                          },
+                            onTap: () {
+                              // Add a small delay to show ripple
+                              Future.delayed(const Duration(milliseconds: 150), () {
+                                widget.onRetry();
+                              });
+                            },
                           child: Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -265,7 +256,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                                 const SizedBox(width: 8),
                                 Text(
                                   "Try Again",
-                                  style: GoogleFonts.quicksand(
+                                  style: GoogleFonts.outfit(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -284,7 +275,7 @@ class _GameResultPopupState extends State<GameResultPopup>
                       onPressed: widget.onHome,
                       child: Text(
                         "Back to Menu",
-                        style: GoogleFonts.quicksand(
+                        style: GoogleFonts.outfit(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white54,

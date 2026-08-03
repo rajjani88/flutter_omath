@@ -128,7 +128,7 @@ class StreakHomeCard extends StatelessWidget {
                           children: [
                             Text(
                               "CURRENT STREAK",
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.outfit(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.orange.shade100,
@@ -152,7 +152,7 @@ class StreakHomeCard extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Text(
                                   "Days",
-                                  style: GoogleFonts.nunito(
+                                  style: GoogleFonts.outfit(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.orange.shade100,
@@ -191,7 +191,7 @@ class StreakHomeCard extends StatelessWidget {
                           isCompleted
                               ? "Daily Challenge Completed!"
                               : "Play Daily Challenge",
-                          style: GoogleFonts.nunito(
+                          style: GoogleFonts.outfit(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -218,7 +218,7 @@ class StreakHomeCard extends StatelessWidget {
                                 children: [
                                   Text(
                                     "PLAY",
-                                    style: GoogleFonts.nunito(
+                                    style: GoogleFonts.outfit(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: StreakColors.orangeText,
@@ -368,7 +368,7 @@ class StreakProfileCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   "You're unstoppable! 🔥",
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.white.withOpacity(0.9),

@@ -37,7 +37,7 @@ class TutorialOverlay extends StatelessWidget {
                     children: [
                       Text(
                         "How to Play",
-                        style: GoogleFonts.quicksand(
+                        style: GoogleFonts.outfit(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -103,7 +103,7 @@ class TutorialOverlay extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   child: Text(
                     "Swipe to explore modes ->",
-                    style: GoogleFonts.quicksand(
+                    style: GoogleFonts.outfit(
                       fontSize: 12,
                       color: Colors.white30,
                     ),
@@ -146,7 +146,7 @@ class TutorialOverlay extends StatelessWidget {
           const SizedBox(height: 30),
           Text(
             title,
-            style: GoogleFonts.quicksand(
+            style: GoogleFonts.outfit(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -156,7 +156,7 @@ class TutorialOverlay extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             description,
-            style: GoogleFonts.quicksand(
+            style: GoogleFonts.outfit(
               fontSize: 16,
               color: Colors.white70,
               height: 1.5,

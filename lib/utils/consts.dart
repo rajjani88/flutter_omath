@@ -3,14 +3,27 @@ class AppConfig {
   static const String appName = "Mathwize";
   static const String appVersion = "1.13.0";
 
+  // --- REVENUECAT SUBSCRIPTIONS ---
+  static const String revenueCatApiKeyApple =
+      "appl_placeholder_key"; // Replace with live RevenueCat Apple API Key
+  static const String revenueCatApiKeyGoogle =
+      "goog_placeholder_key"; // Replace with live RevenueCat Google API Key
+  static const String proEntitlementId = "pro";
+
+  // --- REVENUECAT PACKAGE IDS ---
+  static const String idWeekly = "mathwize_pro_weekly";
+  static const String idMonthly = "mathwize_pro_monthly";
+  static const String idYearly = "mathwize_pro_yearly";
+  static const String idLifetime = "mathwize_pro_lifetime";
+
   // --- LINKS & SUPPORT ---
   static const String privacyPolicyUrl =
       'https://sites.google.com/view/brainy-math-app/privacy-policy';
   static const String termsUrl =
       "https://sites.google.com/view/brainy-math-app/terms-and-conditions";
-  static const String rateUsUrl = "market://details?id=com.raj.omath";
+  static const String rateUsUrl = "market://details?id=com.mathwize.pro";
   static const String rateUsWebUrl =
-      "https://play.google.com/store/apps/details?id=com.raj.omath";
+      "https://play.google.com/store/apps/details?id=com.mathwize.pro";
   static const String supportEmail = "support@example.com";
 
   // --- ASSETS ---

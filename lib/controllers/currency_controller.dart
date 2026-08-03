@@ -1,8 +1,9 @@
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
+import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
+import 'package:flutter/material.dart';
 
 /// Manages the in-game currency (coins) for power-ups and rewards.
 class CurrencyController extends GetxController implements GetxService {
@@ -94,20 +95,9 @@ class CurrencyController extends GetxController implements GetxService {
     }
   }
 
-  /// Placeholder for rewarded ad integration.
-  /// Call this after ad successfully watched.
+  /// Triggered from home screen or when user explicitly wants more coins.
   void watchAdForCoins() {
-    Get.find<AdsController>().showRewardedAd(
-      onRewardGranted: () {
-        addCoins(kCoinsFromAd);
-        Get.snackbar(
-          "🎉 Bonus!",
-          "+$kCoinsFromAd Coins added!",
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(seconds: 2),
-        );
-      },
-    );
+    Get.to(() => const GoProScreen());
   }
 
   /// Check if user can afford a purchase without deducting.

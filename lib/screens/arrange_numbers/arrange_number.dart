@@ -10,10 +10,8 @@ import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/game_button.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:flutter_omath/widgets/glass_icon_button.dart'; // Add this
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 
@@ -27,8 +25,6 @@ class ArrangeNumber extends StatefulWidget {
 class _ArrangeNumberState extends State<ArrangeNumber> {
   final ArrangeNumberController controller = Get.find();
   final SoundController soundController = Get.find<SoundController>();
-  final AdsController adsController = Get.find<AdsController>();
-
   @override
   void initState() {
     super.initState();
@@ -116,7 +112,7 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
                           children: [
                             Text(
                               "Arrange in ",
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.outfit(
                                   color: Colors.white70, fontSize: 16.sp),
                             ),
                             Container(
@@ -139,7 +135,7 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
                             ),
                             Text(
                               " order",
-                              style: GoogleFonts.nunito(
+                              style: GoogleFonts.outfit(
                                   color: Colors.white70, fontSize: 16.sp),
                             ),
                           ],
@@ -256,13 +252,7 @@ class _ArrangeNumberState extends State<ArrangeNumber> {
                           showAddLife: controller.extraLivesGained.value < 2,
                         )),
                     const SizedBox(height: 10),
-                    Obx(
-                      () => adsController.isBannerAd4Loaded.value
-                          ? SizedBox(
-                              height: AdSize.banner.height.toDouble(),
-                              child: AdWidget(ad: adsController.bannerAd4!))
-                          : const SizedBox.shrink(),
-                    ),
+                    
                     const SizedBox(height: 20),
                   ],
                 ),

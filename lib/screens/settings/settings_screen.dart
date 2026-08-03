@@ -29,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
         leading: const Center(child: GlassBackButton()),
         title: Text(
           "Settings",
-          style: GoogleFonts.quicksand(
+          style: GoogleFonts.outfit(
               fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
@@ -144,7 +144,7 @@ class SettingsScreen extends StatelessWidget {
                 Center(
                   child: Text(
                     "Version 1.9.0",
-                    style: GoogleFonts.quicksand(
+                    style: GoogleFonts.outfit(
                         fontSize: 12,
                         color: Colors.white30,
                         fontWeight: FontWeight.w500),
@@ -163,7 +163,7 @@ class SettingsScreen extends StatelessWidget {
       padding: const EdgeInsets.only(left: 8, bottom: 4),
       child: Text(
         title,
-        style: GoogleFonts.quicksand(
+        style: GoogleFonts.outfit(
           fontSize: 12,
           fontWeight: FontWeight.bold,
           color: const Color(0xFFC084FC),
@@ -205,7 +205,7 @@ class SettingsScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: GoogleFonts.quicksand(
+                  style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -252,7 +252,7 @@ class SettingsScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: GoogleFonts.quicksand(
+                    style: GoogleFonts.outfit(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,

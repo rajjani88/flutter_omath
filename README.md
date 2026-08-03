@@ -25,4 +25,10 @@
 <td> 1.12.0</td>
 <td>env added, hints hide</td>
 </tr>
+
+<tr>
+<td> 3.8.26</td>
+<td> 1.15.0</td>
+<td>In app purchase integrated, ads removed</td>
+</tr>
 </table>

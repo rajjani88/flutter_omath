@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_omath/widgets/juicy_button.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:confetti/confetti.dart';
 
@@ -107,7 +106,7 @@ class _UnifiedSuccessPopupState extends State<UnifiedSuccessPopup> {
                   SizedBox(height: 8.h),
                   Text(
                     widget.level != null ? "Level ${widget.level} Cleared!" : "Puzzle Solved!",
-                    style: GoogleFonts.quicksand(
+                    style: GoogleFonts.outfit(
                       color: Colors.white70,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
@@ -138,12 +137,8 @@ class _UnifiedSuccessPopupState extends State<UnifiedSuccessPopup> {
                             color: const Color(0xFF6366f1), // Indigo
                             height: 50.h,
                             onTap: () {
-                              Get.find<AdsController>().showRewardedAd(
-                                onRewardGranted: () {
-                                  Get.find<CurrencyController>().doubleLastReward();
-                                  _hasDoubled.value = true;
-                                },
-                              );
+                              Get.find<CurrencyController>().doubleSessionCoins();
+                              _hasDoubled.value = true;
                             },
                           ),
                         )
@@ -162,7 +157,7 @@ class _UnifiedSuccessPopupState extends State<UnifiedSuccessPopup> {
                     onPressed: widget.onHome,
                     child: Text(
                       "Back to Menu",
-                      style: GoogleFonts.quicksand(
+                      style: GoogleFonts.outfit(
                         color: Colors.white30,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -232,7 +227,7 @@ class _UnifiedSuccessPopupState extends State<UnifiedSuccessPopup> {
         SizedBox(height: 4.h),
         Text(
           label,
-          style: GoogleFonts.quicksand(
+          style: GoogleFonts.outfit(
             color: Colors.white30,
             fontSize: 10.sp,
             fontWeight: FontWeight.bold,

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -205,7 +204,6 @@ class SudokuController extends GetxController {
   }
 
   void _rewardUser() {
-    Get.find<AdsController>().onLevelCompleted();
     Get.find<CurrencyController>()
         .addCoins(kCoinsPerCorrectAnswer * 2); // Double for Sudoku
     Get.find<UserController>().addXp(20);

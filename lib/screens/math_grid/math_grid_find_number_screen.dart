@@ -1,6 +1,5 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/math_grid_puzzle_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -14,8 +13,6 @@ import 'package:get/get.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 class MathGridFindNumber extends StatefulWidget {
   final bool isDailyChallenge;
   final int? dailySeed;
@@ -33,8 +30,6 @@ class MathGridFindNumber extends StatefulWidget {
 class _MathGridFindNumberState extends State<MathGridFindNumber> {
   final controller = Get.find<MathGridPuzzleController>();
   final soundController = Get.find<SoundController>();
-  final adsController = Get.find<AdsController>();
-
   @override
   void initState() {
     super.initState();
@@ -125,7 +120,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                   child: Obx(() => Text(
                         controller.question.value,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(
+                        style: GoogleFonts.outfit(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
@@ -150,13 +145,7 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                     showSolve: true,
                     showAddLife: controller.extraLivesGained.value < 2,
                   )),
-              Obx(
-                () => adsController.isBannerAd1Loaded.value
-                    ? SizedBox(
-                        height: AdSize.banner.height.toDouble(),
-                        child: AdWidget(ad: adsController.bannerAd1!))
-                    : const SizedBox.shrink(),
-              ),
+              
               const SizedBox(height: 10),
             ],
           ),
@@ -165,14 +154,9 @@ class _MathGridFindNumberState extends State<MathGridFindNumber> {
                 ? GameResultPopup(
                     score: controller.level.value,
                     onRetry: () {
-                      Get.find<AdsController>().showRewardedAd(
-                        onRewardGranted: () {
-                          controller.startGame();
-                        },
-                      );
+                      controller.startGame();
                     },
                     onHome: () {
-                      Get.find<AdsController>().showInterstitialAd();
                       Get.offAll(() => const HomeScreen());
                     },
                   )

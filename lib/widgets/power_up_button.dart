@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_omath/controllers/currency_controller.dart';
+import 'package:flutter_omath/controllers/inpurchase_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
+import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
-import 'package:flutter_omath/widgets/reward_choice_dialog.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,7 +24,7 @@ class PowerUpButton extends StatefulWidget {
     required this.cost,
     required this.onActivate,
     this.color = GameColors.secondary,
-    this.description = "How would you like to pay?",
+    this.description = "Power-Up Option",
   });
 
   @override
@@ -54,22 +56,49 @@ class _PowerUpButtonState extends State<PowerUpButton>
   }
 
   void _handleTap() {
-    Get.dialog(
-      RewardChoiceDialog(
-        title: widget.label,
-        icon: widget.icon,
-        coinCost: widget.cost,
-        description: widget.description,
-        onConfirm: () {
-          Get.find<SoundController>().playSuccess();
-          widget.onActivate();
-        },
-      ),
-    );
+    final iapController = Get.find<InAppPurchaseController>();
+    final currencyController = Get.find<CurrencyController>();
+
+    // Pro members get unlimited free power-ups!
+    if (iapController.isPro.value) {
+      Get.find<SoundController>().playSuccess();
+      widget.onActivate();
+      return;
+    }
+
+    // Try spending coins
+    final success = currencyController.spendCoins(widget.cost);
+    if (success) {
+      Get.find<SoundController>().playSuccess();
+      widget.onActivate();
+    } else {
+      // Out of coins -> Show Pro subscription option
+      Get.snackbar(
+        "Out of Coins!",
+        "Go Pro for Unlimited Power-Ups & Infinite Hints!",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.amber.withOpacity(0.95),
+        colorText: Colors.black,
+        mainButton: TextButton(
+          onPressed: () {
+            Get.to(() => const GoProScreen());
+          },
+          child: Text(
+            "GO PRO",
+            style: GoogleFonts.fredoka(
+              color: Colors.purple,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final iapController = Get.find<InAppPurchaseController>();
+
     return GestureDetector(
       onTapDown: (_) {
         setState(() => _isPressed = true);
@@ -106,28 +135,31 @@ class _PowerUpButtonState extends State<PowerUpButton>
               SizedBox(height: 4.h),
               Text(
                 widget.label,
-                style: GoogleFonts.nunito(
+                style: GoogleFonts.outfit(
                   color: Colors.white,
                   fontSize: 11.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 2.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Text(
-                  widget.cost > 0 ? "${widget.cost} 🪙" : "Watch ▶️",
-                  style: GoogleFonts.fredoka(
-                    color: Colors.amber,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.bold,
+              Obx(() {
+                final isPro = iapController.isPro.value;
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                ),
-              ),
+                  child: Text(
+                    isPro ? "FREE 👑" : "${widget.cost} 🪙",
+                    style: GoogleFonts.fredoka(
+                      color: isPro ? Colors.amberAccent : Colors.amber,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              }),
             ],
           ),
         ),

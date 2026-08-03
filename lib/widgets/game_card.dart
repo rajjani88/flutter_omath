@@ -84,7 +84,7 @@ class GameCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.nunito(
+                      style: GoogleFonts.outfit(
                         fontSize: 12,
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w600,

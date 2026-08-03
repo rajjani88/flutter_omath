@@ -111,7 +111,7 @@ class _GameButtonState extends State<GameButton>
                     ],
                     Text(
                       widget.text,
-                      style: GoogleFonts.rubik(
+                      style: GoogleFonts.outfit(
                         fontSize: fs,
                         fontWeight: FontWeight.bold,
                         color: widget.textColor ?? Colors.white,

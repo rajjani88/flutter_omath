@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/sudoku_controller.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
@@ -11,8 +10,6 @@ import 'package:flutter_omath/utils/sudoku_utils.dart';
 import 'package:flutter_omath/widgets/reward_choice_dialog.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 class SudokuScreen extends StatelessWidget {
   final bool isDailyChallenge;
   final int? dailySeed;
@@ -26,8 +23,6 @@ class SudokuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SudokuController controller = Get.put(SudokuController());
-    final AdsController adsController = Get.find<AdsController>();
-
     // Initialize daily challenge if needed
     if (isDailyChallenge) {
       controller.isDailyChallenge = true;
@@ -62,7 +57,7 @@ class SudokuScreen extends StatelessWidget {
                           ),
                           Obx(() => Text(
                                 controller.difficulty.value.name.toUpperCase(),
-                                style: GoogleFonts.nunito(
+                                style: GoogleFonts.outfit(
                                   fontSize: 12.sp,
                                   color: Colors.white70,
                                   fontWeight: FontWeight.bold,
@@ -108,13 +103,7 @@ class SudokuScreen extends StatelessWidget {
                 _buildControlsArea(controller),
                 const SizedBox(height: 20),
 
-                Obx(
-                  () => adsController.isBannerAd2Loaded.value
-                      ? SizedBox(
-                          height: AdSize.banner.height.toDouble(),
-                          child: AdWidget(ad: adsController.bannerAd2!))
-                      : const SizedBox.shrink(),
-                ),
+                
 
                 const SizedBox(height: 20),
               ],
@@ -422,7 +411,7 @@ class SudokuScreen extends StatelessWidget {
           Icon(icon, color: color, size: 28.sp),
           const SizedBox(height: 2),
           Text(label,
-              style: GoogleFonts.nunito(
+              style: GoogleFonts.outfit(
                   color: color, fontSize: 12.sp, fontWeight: FontWeight.bold)),
           if (subtitle != null)
             Text(subtitle,

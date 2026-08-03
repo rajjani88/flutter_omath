@@ -1,6 +1,7 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
+import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/calculate_numbers_contoller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -26,8 +27,6 @@ import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_omath/widgets/streak_components.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 // --- Main Screen ---
 
 class HomeScreen extends StatefulWidget {
@@ -44,8 +43,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final DailyChallengeController dailyController =
       Get.find<DailyChallengeController>(); // Inject
   final SoundController soundController = Get.find<SoundController>();
-  final AdsController adsController = Get.find();
-
   // Bottom Nav State
   String activeTab = 'home'; // home, games, rank, stats
 
@@ -107,9 +104,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // Theme Colors
-    const Color bgStart = Color(0xFF2d1b4e);
-    const Color bgMid = Color(0xFF1a0b2e);
-    const Color bgEnd = Color(0xFF0f071a);
+    const Color bgStart = GameColors.bgTop;
+    const Color bgMid = GameColors.panel;
+    const Color bgEnd = GameColors.bgBottom;
 
     // Dynamic Game Modes List (UPDATED: Icon-based design)
     final List<Map<String, dynamic>> gameModes = [
@@ -213,148 +210,161 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ShaderMask(
-                                  shaderCallback: (bounds) =>
-                                      const LinearGradient(
-                                    colors: [Color(0xFFe2e8f0), Colors.white],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ).createShader(bounds),
-                                  child: Text(
-                                    appName,
-                                    style: GoogleFonts.quicksand(
-                                      fontSize: 28.sp,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppConfig.appName,
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w800,
-                                      fontStyle: FontStyle.italic,
                                       color: Colors.white,
+                                      height: 1.2,
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  "Premium Learning",
-                                  style: GoogleFonts.quicksand(
-                                    fontSize: 12.sp,
-                                    color: const Color(0xFFE9D5FF),
-                                    fontWeight: FontWeight.w500,
+                                  SizedBox(height: 6.h),
+                                  Text(
+                                    "Train your brain today with fun math.",
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 14.sp,
+                                      color: Colors.white.withOpacity(0.6),
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-
-                            // Right Side: Coins + Settings
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Coin Capsule
-                                GlassCard(
-                                  borderRadius: 50,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 4, vertical: 4),
-                                  onTap: () {
-                                    soundController.playClick();
-                                    currencyController.watchAdForCoins();
-                                  },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(left: 4),
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                            color: Colors.amber.shade400,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                                color: Colors.amber.shade200,
-                                                width: 1),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Colors.amber
-                                                      .withAlpha(25),
-                                                  blurRadius: 4)
-                                            ]),
-                                        child: const Text("💲",
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.brown)),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Obx(() => Text(
-                                            "${currencyController.coinBalance.value}",
-                                            style: GoogleFonts.quicksand(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              letterSpacing: 1,
-                                            ),
-                                          )),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        width: 24,
-                                        height: 24,
-                                        decoration: const BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Color(0xFF4ade80),
-                                              Color(0xFF16a34a)
-                                            ],
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                          ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(Icons.add,
-                                            color: Colors.white, size: 16),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Settings Button
-                                GlassCard(
-                                  borderRadius: 50,
-                                  padding: const EdgeInsets.all(10),
-                                  onTap: () {
-                                    soundController.playClick();
-                                    Get.to(() => const SettingsScreen());
-                                  },
-                                  child: const Icon(Icons.settings_rounded,
-                                      color: Colors.white, size: 22),
-                                ),
-                              ],
+                            SizedBox(width: 16.w),
+                            // Settings Button
+                            GlassCard(
+                              borderRadius: 50,
+                              padding: const EdgeInsets.all(12),
+                              onTap: () {
+                                soundController.playClick();
+                                Get.to(() => const SettingsScreen());
+                              },
+                              child: const Icon(Icons.settings_rounded,
+                                  color: Colors.white, size: 24),
                             ),
                           ],
                         ),
 
                         SizedBox(height: 12.h),
 
-                        // --- Daily Streak Section ---
-                        // DailyStreakCard(userController: userController),
-                        Obx(() => StreakHomeCard(
-                              streakCount: dailyController.currentStreak.value,
-                              onTap: () =>
-                                  _onTabSelected('games'), // Go to Achievements
-                              isCompleted:
-                                  dailyController.isTodayCompleted.value,
-                              onPlay: () {
-                                adsController.showRewardedAd(
-                                  onRewardGranted: () =>
-                                      _launchDailyChallenge(),
-                                );
-                              },
-                            )),
+                        // --- Daily Workout Hero Card ---
+                        Obx(() {
+                          final isCompleted =
+                              dailyController.isTodayCompleted.value;
+                          final streak = dailyController.currentStreak.value;
+
+                          return GlassCard(
+                            onTap: () {
+                              soundController.playClick();
+                              if (!isCompleted) {
+                                _launchDailyChallenge();
+                              } else {
+                                _onTabSelected('games');
+                              }
+                            },
+                            borderRadius: 32.r,
+                            padding: const EdgeInsets.all(24),
+                            gradient: LinearGradient(
+                              colors: isCompleted
+                                  ? [
+                                      GameColors.success.withOpacity(0.3),
+                                      GameColors.success.withOpacity(0.1)
+                                    ]
+                                  : [
+                                      GameColors.primary.withOpacity(0.4),
+                                      GameColors.primary.withOpacity(0.1)
+                                    ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 4.h),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(12.r),
+                                        ),
+                                        child: Text(
+                                          isCompleted
+                                              ? "COMPLETED"
+                                              : "DAILY WORKOUT",
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 10.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      Text(
+                                        isCompleted
+                                            ? "Great job today!"
+                                            : "Boost your logic",
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 22.sp,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        "🔥 $streak Day Streak",
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 14.sp,
+                                          color: Colors.white.withOpacity(0.8),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width: 60.w,
+                                  height: 60.w,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: (isCompleted
+                                                  ? GameColors.success
+                                                  : GameColors.primary)
+                                              .withOpacity(0.5),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 10),
+                                        )
+                                      ]),
+                                  child: Icon(
+                                    isCompleted
+                                        ? Icons.check_rounded
+                                        : Icons.play_arrow_rounded,
+                                    color: isCompleted
+                                        ? GameColors.success
+                                        : GameColors.primary,
+                                    size: 32.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
 
                         SizedBox(height: 12.h),
-                        Obx(
-                          () => adsController.isBannerAdLoaded.value
-                              ? SizedBox(
-                                  height: AdSize.banner.height.toDouble(),
-                                  child: AdWidget(ad: adsController.bannerAd!))
-                              : const SizedBox.shrink(),
-                        ),
+
                         SizedBox(height: 12.h),
 
                         // --- Game Modes ---
@@ -365,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             const SizedBox(width: 8),
                             Text(
                               "Play & Learn",
-                              style: GoogleFonts.quicksand(
+                              style: GoogleFonts.outfit(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white.withOpacity(0.9),
@@ -382,9 +392,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: 16.w,
-                            mainAxisSpacing: 16.w,
-                            childAspectRatio: 0.85, // Adjusted for card height
+                            crossAxisSpacing: 12.w,
+                            mainAxisSpacing: 12.w,
+                            childAspectRatio:
+                                1.15, // Make cards shorter to fit more
                           ),
                           itemCount: gameModes.length,
                           itemBuilder: (context, index) {
@@ -459,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         //             children: [
                         //               Text(
                         //                 "Premium Plan",
-                        //                 style: GoogleFonts.quicksand(
+                        //                 style: GoogleFonts.outfit(
                         //                   fontSize: 18,
                         //                   fontWeight: FontWeight.bold,
                         //                   color: Colors.white,
@@ -468,7 +479,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         //               const SizedBox(height: 4),
                         //               Text(
                         //                 "Unlock infinite hearts & juicy themes.",
-                        //                 style: GoogleFonts.quicksand(
+                        //                 style: GoogleFonts.outfit(
                         //                   fontSize: 12,
                         //                   color: Colors.white70,
                         //                 ),
@@ -506,33 +517,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
           // 3. Floating Bottom Nav (4 Icons)
           Positioned(
-            bottom: 20,
+            bottom: 30,
             left: 20,
             right: 20,
             child: Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 400),
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1a0b2e).withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(32.r),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    )
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(Icons.home, 'home'),
-                    _buildNavItem(Icons.videogame_asset, 'games'),
-                    _buildNavItem(Icons.emoji_events, 'leaderboard'),
-                    _buildNavItem(Icons.bar_chart, 'profile'),
-                  ],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32.r),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                    decoration: BoxDecoration(
+                      color: GameColors.panel.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(32.r),
+                      border: Border.all(
+                          color: Colors.white.withOpacity(0.2), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 30,
+                          offset: const Offset(0, 10),
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildNavItem(Icons.home_rounded, 'home', 'Home'),
+                        _buildNavItem(
+                            Icons.extension_rounded, 'games', 'Games'),
+                        _buildNavItem(
+                            Icons.emoji_events_rounded, 'leaderboard', 'Rank'),
+                        _buildNavItem(
+                            Icons.person_rounded, 'profile', 'Profile'),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -554,130 +576,116 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         soundController.playClick();
         onTap();
       },
-      borderRadius: 32.r,
-      //padding: EdgeInsets.all(10.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      borderRadius: 28.r,
+      gradient: LinearGradient(
+        colors: [color.withOpacity(0.15), Colors.transparent],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      child: Stack(
         children: [
-          // 3D Icon with glow
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              // Glow effect
-              Container(
-                width: 60.w,
-                height: 60.w,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.4),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.4),
-                      blurRadius: 30.r,
-                      spreadRadius: 5.r,
-                    )
+          Padding(
+            padding: EdgeInsets.all(12.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(icon, color: color, size: 24.sp),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.outfit(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      desc,
+                      style: GoogleFonts.outfit(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.5),
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
-              ),
-              // 3D Icon
-              GameIcon3D(color: color, icon: icon),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: GoogleFonts.quicksand(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              height: 1.1,
+              ],
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: 4.h),
-          Text(
-            desc,
-            style: GoogleFonts.quicksand(
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFFE9D5FF),
-              height: 1.1,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          Positioned(
+            top: 12.w,
+            right: 12.w,
+            child: Icon(Icons.arrow_outward_rounded,
+                color: Colors.white.withOpacity(0.2), size: 18.sp),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String tabName) {
+  Widget _buildNavItem(IconData icon, String tabName, String label) {
     bool isActive = activeTab == tabName;
     return GestureDetector(
       onTap: () => _onTabSelected(tabName),
-      behavior: HitTestBehavior.opaque, // Fix for touch detection
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutBack,
-        transform: Matrix4.translationValues(0, isActive ? -8 : 0, 0),
-        child: Stack(
-          alignment: Alignment.center,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCirc,
+        padding: EdgeInsets.symmetric(
+            horizontal: isActive ? 16.w : 12.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: isActive
+              ? GameColors.primary.withOpacity(0.2)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Glow effect for active tab
-            if (isActive)
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFc084fc).withOpacity(0.4),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFc084fc).withOpacity(0.6),
-                      blurRadius: 20.r,
-                      spreadRadius: 2.r,
-                    )
-                  ],
-                ),
-              ),
-            // Icon
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isActive ? Colors.transparent : Colors.transparent,
-              ),
-              child: Icon(
-                icon,
-                color: isActive
-                    ? const Color(0xFFc084fc)
-                    : Colors.white.withOpacity(0.6),
-                size: isActive ? 28 : 24,
-              ),
+            Icon(
+              icon,
+              color:
+                  isActive ? GameColors.primary : Colors.white.withOpacity(0.6),
+              size: 26.sp,
             ),
-            // Active indicator dot
-            if (isActive)
-              Positioned(
-                bottom: -12,
-                child: Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFc084fc),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFc084fc).withOpacity(0.8),
-                        blurRadius: 8,
-                      )
-                    ],
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutCirc,
+              width: isActive ? 65.w : 0,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const NeverScrollableScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 8.w),
+                  child: Text(
+                    label,
+                    style: GoogleFonts.outfit(
+                      color: GameColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.sp,
+                    ),
+                    maxLines: 1,
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),
@@ -736,7 +744,7 @@ class DailyStreakCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(isCompleted ? "CHALLENGE COMPLETE" : "DAILY CHALLENGE",
-                        style: GoogleFonts.quicksand(
+                        style: GoogleFonts.outfit(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                             color: isCompleted
@@ -745,7 +753,7 @@ class DailyStreakCard extends StatelessWidget {
                             letterSpacing: 1.5)),
                     const SizedBox(height: 4),
                     Text(isCompleted ? "COME BACK TOMORROW" : "PLAY NOW",
-                        style: GoogleFonts.quicksand(
+                        style: GoogleFonts.outfit(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w900,
                             color: Colors.white)),
@@ -823,7 +831,7 @@ class DailyStreakCard extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(day,
-                          style: GoogleFonts.quicksand(
+                          style: GoogleFonts.outfit(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                               color: textC)),

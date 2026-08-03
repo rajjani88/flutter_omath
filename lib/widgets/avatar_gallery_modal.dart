@@ -43,7 +43,7 @@ class AvatarGalleryModal extends StatelessWidget {
               children: [
                 Text(
                   "Choose Avatar",
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.outfit(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,

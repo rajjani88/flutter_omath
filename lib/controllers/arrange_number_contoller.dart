@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -109,7 +108,6 @@ class ArrangeNumberController extends GetxController implements GetxService {
       Get.find<SoundController>().playSuccess();
 
       if (userAnswerTap.value % 2 == 0) {
-        Get.find<AdsController>().showInterstitialAd();
       }
 
       _updateLeaderboard();
@@ -126,7 +124,6 @@ class ArrangeNumberController extends GetxController implements GetxService {
       Get.find<SoundController>().playWrong();
 
       if (userAnswerTap.value % 2 == 0) {
-        Get.find<AdsController>().showInterstitialAd();
       }
 
       lives.value--;
@@ -147,7 +144,6 @@ class ArrangeNumberController extends GetxController implements GetxService {
     level.value++;
     Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
     Get.find<SoundController>().playSuccess();
-    Get.find<AdsController>().showInterstitialAd();
     generateNewRound();
   }
 

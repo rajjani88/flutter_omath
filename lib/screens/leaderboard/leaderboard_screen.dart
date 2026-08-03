@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/leaderboard_controller.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
@@ -23,33 +22,6 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   final LeaderboardController controller = Get.find<LeaderboardController>();
-  final AdsController adsController = Get.find<AdsController>();
-  Timer? _adsTimer;
-
-  void showAds() {
-    if (_adsTimer != null) {
-      return;
-    }
-    log('timer is started');
-    _adsTimer = Timer(const Duration(seconds: 13), () {
-      adsController.showInterstitialAd();
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    showAds();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    if (_adsTimer != null) {
-      _adsTimer!.cancel();
-      _adsTimer = null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +96,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       const SizedBox(height: 16),
                       Text(
                         "Failed to load leaderboard",
-                        style: GoogleFonts.nunito(
+                        style: GoogleFonts.outfit(
                           color: Colors.white70,
                           fontSize: 16,
                         ),
@@ -148,7 +120,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 return Center(
                   child: Text(
                     "No players yet. Be the first!",
-                    style: GoogleFonts.nunito(
+                    style: GoogleFonts.outfit(
                       color: Colors.white70,
                       fontSize: 16,
                     ),
@@ -275,7 +247,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               children: [
                 Text(
                   entry.odUsername,
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -285,7 +257,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 if (entry.isCurrentUser)
                   Text(
                     "You",
-                    style: GoogleFonts.nunito(
+                    style: GoogleFonts.outfit(
                       fontSize: 12,
                       color: GameColors.secondary,
                     ),
@@ -385,7 +357,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               children: [
                 Text(
                   entry.odUsername,
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -393,7 +365,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 ),
                 Text(
                   "Your Rank",
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.outfit(
                     fontSize: 12,
                     color: GameColors.secondary,
                   ),

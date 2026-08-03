@@ -112,7 +112,7 @@ class MathMazeView extends StatelessWidget {
                                     const SizedBox(height: 14),
                                     Text(
                                         'Reach target in exactly ${controller.moveLimit.value} moves',
-                                        style: GoogleFonts.nunito(
+                                        style: GoogleFonts.outfit(
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.white70))
@@ -141,7 +141,7 @@ class MathMazeView extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     Text("Current",
-                                        style: GoogleFonts.nunito(
+                                        style: GoogleFonts.outfit(
                                             color: Colors.white60,
                                             fontSize: 16.sp)),
                                     Text(
@@ -238,7 +238,7 @@ class MathMazeView extends StatelessWidget {
     return Column(
       children: [
         Text(label,
-            style: GoogleFonts.nunito(color: Colors.white70, fontSize: 14)),
+            style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

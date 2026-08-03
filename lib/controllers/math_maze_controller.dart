@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
@@ -122,8 +121,6 @@ class MathMazeController extends GetxController {
         level.value++;
         Get.find<CurrencyController>().addCoins(kCoinsPerCorrectAnswer);
         Get.find<SoundController>().playSuccess();
-        Get.find<AdsController>().onLevelCompleted();
-
         _updateLeaderboard();
         _checkAchievements();
 

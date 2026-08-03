@@ -13,14 +13,14 @@ void showUnlockGameModeDialog({
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'This game mode is free to play!\n\nJust watch a short ad to start playing or go Pro and never see ads again!',
+            'Unlock all premium game modes, unlimited power-ups, and daily challenges with MathWize Pro!',
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          Divider(),
+          const Divider(),
           const SizedBox(height: 8),
-          Text(
-            '⚡ Go Pro: Unlimited fun, zero ads!',
+          const Text(
+            '⚡ Go Pro: Unlimited Fun & Pure Focus!',
             style: TextStyle(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
@@ -30,16 +30,15 @@ void showUnlockGameModeDialog({
         TextButton(
           onPressed: () {
             Get.back(); // Close dialog
-            onWatchAd();
           },
-          child: Text('Continue with Ads'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
             Get.back(); // Close dialog
             onGoPro();
           },
-          child: Text('Go Pro (No Ads Ever)'),
+          child: const Text('Unlock MathWize Pro'),
         ),
       ],
     ),

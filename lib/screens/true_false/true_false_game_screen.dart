@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/inpurchase_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/true_false_controller.dart';
@@ -15,8 +14,6 @@ import 'package:get/get.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 class TrueFalseGame extends StatefulWidget {
   const TrueFalseGame({super.key});
 
@@ -25,10 +22,10 @@ class TrueFalseGame extends StatefulWidget {
 }
 
 class _TrueFalseGameState extends State<TrueFalseGame> {
-  // AdsController adsController = Get.find(); // Used inside controller mostly or for interstitial
+  //
+ // Used inside controller mostly or for interstitial
   // InAppPurchaseController purchaseController = Get.find(); // Used locally for restart
   final SoundController soundController = Get.find<SoundController>();
-  final AdsController adsController = Get.find();
   final InAppPurchaseController purchaseController = Get.find();
 
   @override
@@ -123,7 +120,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                           child: Text(
                             controller.question.value,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.nunito(
+                            style: GoogleFonts.outfit(
                               fontSize: 42.sp,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
@@ -192,13 +189,7 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                           )),
                       const SizedBox(height: 20),
 
-                      Obx(
-                        () => adsController.isBannerAd3Loaded.value
-                            ? SizedBox(
-                                height: AdSize.banner.height.toDouble(),
-                                child: AdWidget(ad: adsController.bannerAd3!))
-                            : const SizedBox.shrink(),
-                      ),
+                      
                       const SizedBox(height: 20),
                     ],
                   );
@@ -215,7 +206,6 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                   onRetry: () {
                     // Logic for retry
                     if (!purchaseController.isPro.value) {
-                      adsController.showInterstitialAd();
                     }
                     controller.startGame();
                   },

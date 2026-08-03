@@ -103,7 +103,7 @@ class _JuicyButtonState extends State<JuicyButton> {
         ],
         Text(
           widget.label.toUpperCase(),
-          style: GoogleFonts.nunito(
+          style: GoogleFonts.outfit(
             fontSize: 18.sp,
             fontWeight: FontWeight.w900,
             color: isDisabled ? Colors.white38 : Colors.white,

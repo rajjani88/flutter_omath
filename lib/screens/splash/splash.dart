@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
+import 'package:flutter_omath/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter_omath/utils/consts.dart';
+import 'package:flutter_omath/utils/game_colors.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,48 +37,33 @@ class _SplashScreenState extends State<SplashScreen> {
       debugPrint('Controller initialization warning: $e');
     }
 
-    // Navigate to Home Screen (removing splash from stack)
+    final prefs = await SharedPreferences.getInstance();
+    final bool onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
+
+    // Navigate to Home Screen or Onboarding
     if (mounted) {
-      Get.offAll(() => const HomeScreen());
+      if (onboardingSeen) {
+        Get.offAll(() => const HomeScreen());
+      } else {
+        Get.offAll(() => const OnboardingScreen());
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Cosmic Theme Colors
-    const Color bgStart = Color(0xFF2d1b4e);
-    const Color bgMid = Color(0xFF1a0b2e);
-    const Color bgEnd = Color(0xFF0f071a);
-
     return Scaffold(
-      backgroundColor: bgEnd,
+      backgroundColor: GameColors.bgBottom,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [bgStart, bgMid, bgEnd],
+            colors: [GameColors.bgTop, GameColors.bgBottom],
           ),
         ),
         child: Stack(
           children: [
-            // Animated Stars/Math Symbols Background (Optional subtle effect)
-            ...List.generate(15, (index) {
-              return Positioned(
-                top: (index * 50.0) % MediaQuery.of(context).size.height,
-                left: (index * 80.0) % MediaQuery.of(context).size.width,
-                child: FadeIn(
-                  delay: Duration(milliseconds: index * 100),
-                  child: Text(
-                    ['✨', '➕', '➖', '✖️', '➗', '🔢'][index % 6],
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white.withOpacity(0.1),
-                    ),
-                  ),
-                ),
-              );
-            }),
 
             // Center Content
             Center(
@@ -94,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.purpleAccent.withOpacity(0.5),
+                              color: GameColors.primary.withOpacity(0.5),
                               blurRadius: 60,
                               spreadRadius: 20,
                             ),
@@ -119,16 +107,15 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
                         colors: [
-                          Color(0xFFfbbf24), // Gold
-                          Color(0xFFffffff), // White
-                          Color(0xFFc084fc), // Purple
+                          Colors.white,
+                          Color(0xFFE9D5FF),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ).createShader(bounds),
                       child: Text(
                         appName,
-                        style: GoogleFonts.quicksand(
+                        style: GoogleFonts.outfit(
                           fontSize: 48,
                           fontWeight: FontWeight.w900,
                           fontStyle: FontStyle.italic,
@@ -147,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     duration: const Duration(milliseconds: 1500),
                     child: Text(
                       "Train Your Brain with Math",
-                      style: GoogleFonts.quicksand(
+                      style: GoogleFonts.outfit(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withOpacity(0.7),
@@ -173,7 +160,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
                       valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.purpleAccent),
+                          AlwaysStoppedAnimation<Color>(GameColors.primary),
                     ),
                   ),
                 ),

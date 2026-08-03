@@ -165,7 +165,7 @@ class _CalculateNumbersScreenState extends State<CalculateNumbersScreen> {
                                     children: [
                                       Obx(() => Text(
                                             controller.question.value,
-                                            style: GoogleFonts.nunito(
+                                            style: GoogleFonts.outfit(
                                               fontSize: 56.sp, // Larger text
                                               fontWeight: FontWeight.w900,
                                               color: Colors.white,

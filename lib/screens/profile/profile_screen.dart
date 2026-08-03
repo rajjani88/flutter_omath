@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_omath/controllers/ads_contoller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
@@ -12,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_omath/widgets/avatar_gallery_modal.dart';
 import 'package:flutter_omath/widgets/streak_components.dart';
+import 'package:flutter_omath/utils/game_colors.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -33,10 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
 
-  final AdsController adsController = Get.find<AdsController>();
-
-  Timer? _adsTimer;
-
   @override
   void initState() {
     super.initState();
@@ -51,17 +47,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     _bounceAnimation = Tween<double>(begin: -5, end: 5).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
-    showAds();
-  }
-
-  showAds() {
-    if (_adsTimer != null) {
-      return;
-    }
-    log('timer is started');
-    _adsTimer = Timer(const Duration(seconds: 10), () {
-      adsController.showInterstitialAd();
-    });
   }
 
   @override
@@ -69,9 +54,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     nameController.dispose();
     _bounceController.dispose();
     _debounce?.cancel();
-    if (_adsTimer != null) {
-      _adsTimer!.cancel();
-    }
     super.dispose();
   }
 
@@ -108,12 +90,17 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Theme base color from React: #2d1b4e
-    const bgColor = Color(0xFF2d1b4e);
-
     return Scaffold(
-      backgroundColor: bgColor,
-      body: SingleChildScrollView(
+      backgroundColor: GameColors.bgBottom,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [GameColors.bgTop, GameColors.bgBottom],
+          ),
+        ),
+        child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
           child: Column(
@@ -125,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 children: [
                   Text(
                     "Profile",
-                    style: GoogleFonts.nunito(
+                    style: GoogleFonts.outfit(
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
@@ -144,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 // Gradient: Purple to Transparent (vertical)
                 gradient: LinearGradient(
                   colors: [
-                    Colors.purple.withOpacity(0.1),
+                    GameColors.primary.withOpacity(0.15),
                     Colors.transparent,
                   ],
                   begin: Alignment.topCenter,
@@ -156,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   children: [
                     Text(
                       "CHOOSE AVATAR",
-                      style: GoogleFonts.nunito(
+                      style: GoogleFonts.outfit(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white60,
@@ -181,13 +168,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFC084FC), Color(0xFFEC4899)],
+                            colors: [GameColors.primary, GameColors.secondary],
                             begin: Alignment.bottomLeft,
                             end: Alignment.topRight,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFC084FC).withOpacity(0.4),
+                              color: GameColors.primary.withOpacity(0.4),
                               blurRadius: 30,
                               spreadRadius: 0,
                             ),
@@ -195,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                         child: Container(
                           decoration: const BoxDecoration(
-                            color: Color(0xFF1a0b2e),
+                            color: GameColors.panel,
                             shape: BoxShape.circle,
                           ),
                           child: ClipOval(
@@ -307,11 +294,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "USERNAME",
-                      style: GoogleFonts.nunito(
+                      "YOUR USERNAME",
+                      style: GoogleFonts.outfit(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white60,
+                        color: GameColors.primary.withOpacity(0.8),
                         letterSpacing: 2,
                       ),
                     ),
@@ -326,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                               TextField(
                                 controller: nameController,
                                 onChanged: _onUsernameChanged,
-                                style: GoogleFonts.nunito(
+                                style: GoogleFonts.outfit(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -345,7 +332,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFC084FC),
+                                      color: GameColors.primary,
                                     ),
                                   ),
                                 ),
@@ -431,7 +418,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           padding: const EdgeInsets.only(left: 4),
                           child: Text(
                             "✓ Username available",
-                            style: GoogleFonts.nunito(
+                            style: GoogleFonts.outfit(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.greenAccent,
@@ -444,7 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           padding: const EdgeInsets.only(left: 4),
                           child: Text(
                             "✗ Username taken or too short",
-                            style: GoogleFonts.nunito(
+                            style: GoogleFonts.outfit(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.redAccent,
@@ -469,7 +456,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
               // 4. Share Button (JuicyButton)
               JuicyButton(
-                color: const Color(0xFF38BDF8), // Sky Blue
+                color: GameColors.secondary, // Sky Blue
                 icon: Icons.share_rounded,
                 label: "Share & Earn 50 Coins",
                 onTap: () => userController.shareApp(),
@@ -479,6 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             ],
           ),
         ),
+      ),
       ),
     );
   }
