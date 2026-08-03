@@ -20,6 +20,8 @@ import 'package:flutter_omath/screens/sudoku/sudoku_screen.dart';
 import 'package:flutter_omath/screens/true_false/true_false_game_screen.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:get/get.dart';
+import 'package:flutter_omath/controllers/inpurchase_controller.dart';
+import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 import 'package:flutter_omath/widgets/floating_background.dart';
 import 'package:flutter_omath/widgets/game_icon_3d.dart';
 import 'package:flutter_omath/widgets/glass_card.dart';
@@ -43,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final DailyChallengeController dailyController =
       Get.find<DailyChallengeController>(); // Inject
   final SoundController soundController = Get.find<SoundController>();
+  final InAppPurchaseController iapController = Get.find<InAppPurchaseController>();
   // Bottom Nav State
   String activeTab = 'home'; // home, games, rank, stats
 
@@ -115,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Find the hidden patterns",
         "color": const Color(0xFF34d399), // Mint Green
         "icon": Icons.grid_3x3,
+        "isPremium": false,
         "onTap": () => Get.to(() => const MathGridFindNumber())
       },
       {
@@ -122,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Solve the 6x6 grid",
         "color": const Color(0xFFfb923c), // Orange
         "icon": Icons.grid_on_rounded,
+        "isPremium": true,
         "onTap": () => Get.to(() => const SudokuScreen())
       },
       {
@@ -129,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Quick math decisions",
         "color": const Color(0xFF38bdf8), // Sky Blue
         "icon": Icons.check_circle_outline,
+        "isPremium": false,
         "onTap": () => Get.to(() => const TrueFalseGame())
       },
       {
@@ -136,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Order from low to high",
         "color": const Color(0xFFfbbf24), // Amber
         "icon": Icons.swap_horiz,
+        "isPremium": true,
         "onTap": () => Get.to(() => const ArrangeNumber())
       },
       {
@@ -143,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Solve the equation",
         "color": const Color(0xFFf472b6), // Hot Pink
         "icon": Icons.calculate,
+        "isPremium": false,
         "onTap": () => Get.to(() =>
             const CalculateNumbersScreen(selectedMode: OperationMode.auto))
       },
@@ -151,6 +159,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "desc": "Navigate the puzzle",
         "color": const Color(0xFFc084fc), // Purple
         "icon": Icons.extension,
+        "isPremium": true,
         "onTap": () => Get.to(() => MathMazeView())
       },
     ];
@@ -400,111 +409,118 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           itemCount: gameModes.length,
                           itemBuilder: (context, index) {
                             final mode = gameModes[index];
-                            return _buildGameCard(
-                              title: mode['title'],
-                              desc: mode['desc'],
-                              color: mode['color'],
-                              icon: mode['icon'],
-                              onTap: mode['onTap'],
-                            );
+                            return Obx(() {
+                              final isPremium = mode['isPremium'] ?? false;
+                              return _buildGameCard(
+                                title: mode['title'],
+                                desc: mode['desc'],
+                                color: mode['color'],
+                                icon: mode['icon'],
+                                isPremium: isPremium,
+                                onTap: mode['onTap'],
+                              );
+                            });
                           },
                         ),
 
-                        SizedBox(height: 14.h),
-
-                        // --- Premium Banner Section ---
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(horizontal: 4),
-                        //   child: GlassCard(
-                        //     onTap: () {
-                        //       soundController.playClick();
-                        //       Get.to(() => const GoProScreen());
-                        //     },
-                        //     borderRadius: 32,
-                        //     padding: const EdgeInsets.all(24),
-                        //     // Gradient: Purple to Blue low opacity
-                        //     gradient: LinearGradient(
-                        //       colors: [
-                        //         Colors.purple.withOpacity(0.2),
-                        //         Colors.blue.withOpacity(0.2),
-                        //       ],
-                        //       begin: Alignment.centerLeft,
-                        //       end: Alignment.centerRight,
-                        //     ),
-                        //     child: Row(
-                        //       children: [
-                        //         // Crown Icon Container
-                        //         Container(
-                        //           width: 48,
-                        //           height: 48,
-                        //           decoration: BoxDecoration(
-                        //             borderRadius: BorderRadius.circular(16),
-                        //             gradient: const LinearGradient(
-                        //               colors: [
-                        //                 Color(0xFFFBBF24), // Amber 400
-                        //                 Color(0xFFF97316), // Orange 500
-                        //               ],
-                        //               begin: Alignment.topLeft,
-                        //               end: Alignment.bottomRight,
-                        //             ),
-                        //             boxShadow: [
-                        //               BoxShadow(
-                        //                 color: Colors.orange.withOpacity(0.4),
-                        //                 blurRadius: 12.r,
-                        //                 offset: Offset(0, 4.h),
-                        //               )
-                        //             ],
-                        //           ),
-                        //           child: const Icon(
-                        //             Icons.workspace_premium_rounded,
-                        //             color: Colors.white,
-                        //             size: 24,
-                        //           ),
-                        //         ),
-                        //         const SizedBox(width: 16),
-                        //         // Text Content
-                        //         Expanded(
-                        //           child: Column(
-                        //             crossAxisAlignment:
-                        //                 CrossAxisAlignment.start,
-                        //             children: [
-                        //               Text(
-                        //                 "Premium Plan",
-                        //                 style: GoogleFonts.outfit(
-                        //                   fontSize: 18,
-                        //                   fontWeight: FontWeight.bold,
-                        //                   color: Colors.white,
-                        //                 ),
-                        //               ),
-                        //               const SizedBox(height: 4),
-                        //               Text(
-                        //                 "Unlock infinite hearts & juicy themes.",
-                        //                 style: GoogleFonts.outfit(
-                        //                   fontSize: 12,
-                        //                   color: Colors.white70,
-                        //                 ),
-                        //               ),
-                        //             ],
-                        //           ),
-                        //         ),
-                        //         const SizedBox(width: 12),
-                        //         // Arrow Button
-                        //         Container(
-                        //           padding: const EdgeInsets.all(8),
-                        //           decoration: BoxDecoration(
-                        //             color: Colors.white.withOpacity(0.1),
-                        //             shape: BoxShape.circle,
-                        //           ),
-                        //           child: const Icon(
-                        //             Icons.arrow_forward_rounded,
-                        //             color: Colors.white,
-                        //             size: 16,
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
+                        Obx(() {
+                          if (iapController.isPro.value) {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            children: [
+                              SizedBox(height: 14.h),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: GlassCard(
+                                  onTap: () {
+                                    soundController.playClick();
+                                    Get.to(() => const GoProScreen());
+                                  },
+                                  borderRadius: 32,
+                                  padding: const EdgeInsets.all(24),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.purple.withOpacity(0.2),
+                                      Colors.blue.withOpacity(0.2),
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(16),
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFFFBBF24), // Amber 400
+                                              Color(0xFFF97316), // Orange 500
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.orange.withOpacity(0.4),
+                                              blurRadius: 12.r,
+                                              offset: Offset(0, 4.h),
+                                            )
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.workspace_premium_rounded,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Premium Plan",
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              "Unlock infinite hearts & juicy themes.",
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 12,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.arrow_forward_rounded,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
 
                         SizedBox(height: 30.h),
                       ],
@@ -570,11 +586,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     required Color color,
     required IconData icon,
     required VoidCallback onTap,
+    bool isPremium = false,
   }) {
+    final isProUser = iapController.isPro.value;
+    final showLock = isPremium && !isProUser;
+
     return GlassCard(
       onTap: () {
         soundController.playClick();
-        onTap();
+        if (showLock) {
+          Get.to(() => const GoProScreen());
+        } else {
+          onTap();
+        }
       },
       borderRadius: 28.r,
       gradient: LinearGradient(
@@ -632,8 +656,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Positioned(
             top: 12.w,
             right: 12.w,
-            child: Icon(Icons.arrow_outward_rounded,
-                color: Colors.white.withOpacity(0.2), size: 18.sp),
+            child: Icon(
+              showLock ? Icons.lock_outline_rounded : Icons.arrow_outward_rounded,
+              color: showLock ? Colors.amberAccent : Colors.white.withOpacity(0.2),
+              size: 18.sp,
+            ),
           ),
         ],
       ),

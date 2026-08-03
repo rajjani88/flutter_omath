@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/inpurchase_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
-import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
+import 'package:flutter_omath/widgets/out_of_coins_dialog.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -72,25 +72,10 @@ class _PowerUpButtonState extends State<PowerUpButton>
       Get.find<SoundController>().playSuccess();
       widget.onActivate();
     } else {
-      // Out of coins -> Show Pro subscription option
-      Get.snackbar(
-        "Out of Coins!",
-        "Go Pro for Unlimited Power-Ups & Infinite Hints!",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.amber.withOpacity(0.95),
-        colorText: Colors.black,
-        mainButton: TextButton(
-          onPressed: () {
-            Get.to(() => const GoProScreen());
-          },
-          child: Text(
-            "GO PRO",
-            style: GoogleFonts.fredoka(
-              color: Colors.purple,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+      showOutOfCoinsPaywallDialog(
+        powerUpName: widget.label,
+        requiredCoins: widget.cost,
+        currentCoins: currencyController.coinBalance.value,
       );
     }
   }

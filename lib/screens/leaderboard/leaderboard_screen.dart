@@ -35,7 +35,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
-                GlassBackButton(onTap: () => Get.back()),
+                const GlassBackButton(),
                 const SizedBox(width: 16),
                 Text(
                   "🏆 Leaderboard",

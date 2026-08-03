@@ -7,6 +7,7 @@ import 'package:flutter_omath/widgets/floating_background.dart'; // New Import
 import 'package:flutter_omath/widgets/streak_components.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
+import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,6 +22,8 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   final UserController userController = Get.find<UserController>();
   final AchievementController achievementController =
       Get.find<AchievementController>();
+  final DailyChallengeController dailyController =
+      Get.find<DailyChallengeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         leadingWidth: 70,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Center(child: GlassBackButton(onTap: () => Get.back())),
+        leading: const Center(child: GlassBackButton()),
         title: Text(
           "Achievements",
           style: GoogleFonts.outfit(
@@ -68,7 +71,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
               children: [
                 // Streak Card
                 Obx(() => StreakHomeCard(
-                      streakCount: userController.loginStreak.value,
+                      streakCount: dailyController.currentStreak.value,
                     )),
 
                 const SizedBox(height: 30),

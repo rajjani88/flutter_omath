@@ -40,6 +40,8 @@ class AppConfig {
   static const int costFreeze = 50;
   static const int costSkip = 100;
   static const int costHint = 30;
+  static const int costSolve = 200;
+  static const int costLife = 200;
   static const int durationFreezeSeconds = 10;
 
   // --- GAMEPLAY CONSTANTS ---
@@ -69,6 +71,8 @@ const int kCoinsFromAd = AppConfig.coinsFromAd;
 const int kFreezeCost = AppConfig.costFreeze;
 const int kSkipCost = AppConfig.costSkip;
 const int kHintCost = AppConfig.costHint;
+const int kSolveCost = AppConfig.costSolve;
+const int kLifeCost = AppConfig.costLife;
 const int kFreezeDuration = AppConfig.durationFreezeSeconds;
 
 // Restore missing global constants for backward compatibility

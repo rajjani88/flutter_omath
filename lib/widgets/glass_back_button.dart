@@ -10,6 +10,7 @@ class GlassBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         try {
           Get.find<SoundController>().playClick();
@@ -19,7 +20,7 @@ class GlassBackButton extends StatelessWidget {
         if (onTap != null) {
           onTap!();
         } else {
-          Get.back();
+          Navigator.of(context).pop();
         }
       },
       child: Container(

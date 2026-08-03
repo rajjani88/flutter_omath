@@ -112,7 +112,7 @@ class GameBottomBar extends StatelessWidget {
             PowerUpButton(
               icon: Icons.auto_fix_high,
               label: "Solve",
-              cost: 0, // This will be free via ad in the RewardChoiceDialog logic
+              cost: kSolveCost,
               color: Colors.purple,
               description: "Automatically solve this level!",
               onActivate: onSolve!,
@@ -122,7 +122,7 @@ class GameBottomBar extends StatelessWidget {
             PowerUpButton(
               icon: Icons.favorite,
               label: "Life",
-              cost: 0,
+              cost: kLifeCost,
               color: Colors.redAccent,
               description: "Earn 1 life. Max you can get 2!",
               onActivate: onAddLife!,

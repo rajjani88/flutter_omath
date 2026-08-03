@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
+import 'package:flutter_omath/controllers/inpurchase_controller.dart';
 import 'package:flutter/material.dart';
 
 /// Manages the in-game currency (coins) for power-ups and rewards.
@@ -60,12 +61,22 @@ class CurrencyController extends GetxController implements GetxService {
 
   /// Add coins when user wins a level or watches an ad.
   void addCoins(int amount, {bool trackAsReward = true, bool isSession = true}) {
-    coinBalance.value += amount;
+    int finalAmount = amount;
+    try {
+      if (Get.isRegistered<InAppPurchaseController>()) {
+        final iapController = Get.find<InAppPurchaseController>();
+        if (iapController.isPro.value) {
+          finalAmount = amount * 2;
+        }
+      }
+    } catch (_) {}
+
+    coinBalance.value += finalAmount;
     if (trackAsReward) {
-      lastRewardAmount.value = amount;
+      lastRewardAmount.value = finalAmount;
     }
     if (isSession) {
-      sessionCoins.value += amount;
+      sessionCoins.value += finalAmount;
     }
     _saveBalance();
   }

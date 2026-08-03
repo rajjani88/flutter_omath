@@ -32,7 +32,7 @@ class _GoProScreenState extends State<GoProScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GlassBackButton(onTap: () => Get.back()),
+                  const GlassBackButton(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
@@ -142,6 +142,8 @@ class _GoProScreenState extends State<GoProScreen> {
                         children: [
                           _buildFeatureRow('⚡ Unlimited Power-Ups', 'Freeze time, skip levels & instant hints', Icons.flash_on_rounded, GameColors.warning),
                           const Divider(color: Colors.white12, height: 20),
+                          _buildFeatureRow('🪙 2x Double Coins Earned', 'Earn double coins for every win and challenge!', Icons.monetization_on_rounded, Colors.amberAccent),
+                          const Divider(color: Colors.white12, height: 20),
                           _buildFeatureRow('🏆 Exclusive Pro Badges & Avatars', 'Unlock all avatars & flex on leaderboard', Icons.workspace_premium_rounded, GameColors.secondary),
                           const Divider(color: Colors.white12, height: 20),
                           _buildFeatureRow('📅 Daily Challenge Replays', 'Never lose your streak, replay anytime', Icons.calendar_month_rounded, GameColors.success),
@@ -174,7 +176,7 @@ class _GoProScreenState extends State<GoProScreen> {
                         _buildPlanCard(
                           plan: SubscriptionPlan.yearly,
                           title: 'Annual Pass',
-                          subtitle: '7 Days Free Trial',
+                          subtitle: 'Billed annually',
                           price: controller.priceYearly.value,
                           badgeText: 'BEST VALUE - SAVE 65%',
                           isBestValue: true,
@@ -185,7 +187,7 @@ class _GoProScreenState extends State<GoProScreen> {
                         _buildPlanCard(
                           plan: SubscriptionPlan.monthly,
                           title: 'Monthly Pass',
-                          subtitle: '3 Days Free Trial',
+                          subtitle: 'Billed monthly',
                           price: controller.priceMonthly.value,
                         ),
                         const SizedBox(height: 10),
@@ -194,17 +196,8 @@ class _GoProScreenState extends State<GoProScreen> {
                         _buildPlanCard(
                           plan: SubscriptionPlan.weekly,
                           title: 'Weekly Pass',
-                          subtitle: '3 Days Free Trial',
+                          subtitle: 'Billed weekly',
                           price: controller.priceWeekly.value,
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Lifetime
-                        _buildPlanCard(
-                          plan: SubscriptionPlan.lifetime,
-                          title: 'Lifetime Unlimited',
-                          subtitle: 'One-time payment • Pay once, play forever',
-                          price: controller.priceLifetime.value,
                         ),
                       ],
                     )),
@@ -243,13 +236,13 @@ class _GoProScreenState extends State<GoProScreen> {
                         );
                       }
 
-                      String btnText = 'START 7-DAY FREE TRIAL';
+                      String btnText = 'SUBSCRIBE NOW';
                       if (controller.selectedPlan.value == SubscriptionPlan.weekly) {
-                        btnText = 'START 3-DAY FREE TRIAL';
+                        btnText = 'SUBSCRIBE WEEKLY';
                       } else if (controller.selectedPlan.value == SubscriptionPlan.monthly) {
-                        btnText = 'START 3-DAY FREE TRIAL';
-                      } else if (controller.selectedPlan.value == SubscriptionPlan.lifetime) {
-                        btnText = 'GET LIFETIME UNLIMITED';
+                        btnText = 'SUBSCRIBE MONTHLY';
+                      } else if (controller.selectedPlan.value == SubscriptionPlan.yearly) {
+                        btnText = 'SUBSCRIBE ANNUALLY';
                       }
 
                       return GameButton(
