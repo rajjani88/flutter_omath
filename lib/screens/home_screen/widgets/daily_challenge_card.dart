@@ -3,8 +3,6 @@ import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/screens/math_grid/math_grid_find_number_screen.dart';
 import 'package:flutter_omath/screens/sudoku/sudoku_screen.dart';
 import 'package:get/get.dart';
-import 'package:flutter_omath/controllers/inpurchase_controller.dart';
-import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
 
 class DailyChallengeCard extends StatelessWidget {
   const DailyChallengeCard({super.key});
@@ -100,16 +98,11 @@ class DailyChallengeCard extends StatelessWidget {
                             dailySeed: seed,
                           ));
                     } else {
-                      // Sudoku (Premium Mode)
-                      final iapController = Get.find<InAppPurchaseController>();
-                      if (!iapController.isPro.value) {
-                        Get.to(() => const GoProScreen());
-                      } else {
-                        Get.to(() => SudokuScreen(
-                              isDailyChallenge: true,
-                              dailySeed: seed,
-                            ));
-                      }
+                      // Sudoku
+                      Get.to(() => SudokuScreen(
+                            isDailyChallenge: true,
+                            dailySeed: seed,
+                          ));
                     }
                   },
                   style: ElevatedButton.styleFrom(

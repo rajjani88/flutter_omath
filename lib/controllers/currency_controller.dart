@@ -2,8 +2,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
-import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
-import 'package:flutter_omath/controllers/inpurchase_controller.dart';
+import 'package:flutter_omath/controllers/ads_controller.dart';
 import 'package:flutter/material.dart';
 
 /// Manages the in-game currency (coins) for power-ups and rewards.
@@ -61,22 +60,12 @@ class CurrencyController extends GetxController implements GetxService {
 
   /// Add coins when user wins a level or watches an ad.
   void addCoins(int amount, {bool trackAsReward = true, bool isSession = true}) {
-    int finalAmount = amount;
-    try {
-      if (Get.isRegistered<InAppPurchaseController>()) {
-        final iapController = Get.find<InAppPurchaseController>();
-        if (iapController.isPro.value) {
-          finalAmount = amount * 2;
-        }
-      }
-    } catch (_) {}
-
-    coinBalance.value += finalAmount;
+    coinBalance.value += amount;
     if (trackAsReward) {
-      lastRewardAmount.value = finalAmount;
+      lastRewardAmount.value = amount;
     }
     if (isSession) {
-      sessionCoins.value += finalAmount;
+      sessionCoins.value += amount;
     }
     _saveBalance();
   }
@@ -106,9 +95,31 @@ class CurrencyController extends GetxController implements GetxService {
     }
   }
 
-  /// Triggered from home screen or when user explicitly wants more coins.
+  /// Triggered from home screen or when user explicitly watches an ad.
   void watchAdForCoins() {
-    Get.to(() => const GoProScreen());
+    try {
+      final adsController = Get.find<AdsController>();
+      adsController.showRewardedAd(onRewardGranted: () {
+        addCoins(kCoinsFromAd);
+        Get.snackbar(
+          "Coins Earned",
+          "You received $kCoinsFromAd 🪙",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green.withOpacity(0.8),
+          colorText: Colors.white,
+        );
+      });
+    } catch (e) {
+      // Fallback
+      addCoins(kCoinsFromAd);
+      Get.snackbar(
+        "Coins Earned",
+        "You received $kCoinsFromAd 🪙",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green.withOpacity(0.8),
+        colorText: Colors.white,
+      );
+    }
   }
 
   /// Check if user can afford a purchase without deducting.

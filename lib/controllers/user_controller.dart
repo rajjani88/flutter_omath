@@ -1,15 +1,21 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/currency_controller.dart';
-import 'package:flutter_omath/controllers/inpurchase_controller.dart';
-import 'package:flutter_omath/screens/go_pro/go_pro_screen.dart';
+import 'package:flutter_omath/controllers/leaderboard_controller.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// UserController: Manages authentication, profile, daily rewards, and social sharing
 class UserController extends GetxController {
   final SupabaseClient _supabase = Supabase.instance.client;
+
+  // Persistent device user ID
+  String _deviceId = '';
+  String get effectiveUserId => currentUser.value?.id ?? _deviceId;
 
   // User state
   final Rx<User?> currentUser = Rx<User?>(null);
@@ -21,7 +27,7 @@ class UserController extends GetxController {
   final RxString odUsername = 'Player'.obs;
   final RxInt avatarId = 0.obs;
   final RxInt totalXp = 0.obs;
-  final RxInt loginStreak = 0.obs;
+  final RxInt loginStreak = 1.obs;
   final Rx<DateTime?> lastLogin = Rx<DateTime?>(null);
   final Rx<DateTime?> lastShareDate = Rx<DateTime?>(null);
 
@@ -32,72 +38,218 @@ class UserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Delay initialization to ensure UI is ready (prevents No Overlay Widget errors)
-    Future.delayed(const Duration(seconds: 2), () {
+    _loadLocalData();
+    // Initialize cloud profile
+    Future.delayed(const Duration(milliseconds: 500), () {
       _initAuth();
     });
   }
 
-  /// Initialize authentication - auto anonymous login
+  /// Load device ID and cached profile from SharedPreferences
+  Future<void> _loadLocalData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _deviceId = prefs.getString('DEVICE_ID') ?? '';
+      if (_deviceId.isEmpty) {
+        _deviceId = _generateUuidV4();
+        await prefs.setString('DEVICE_ID', _deviceId);
+      }
+
+      final savedName = prefs.getString('DEVICE_USERNAME');
+      if (savedName != null && savedName.isNotEmpty) {
+        odUsername.value = savedName;
+      }
+
+      totalXp.value = prefs.getInt('SAVED_TOTAL_XP') ?? 0;
+      avatarId.value = prefs.getInt('SAVED_AVATAR_ID') ?? 0;
+      loginStreak.value = prefs.getInt('SAVED_LOGIN_STREAK') ?? 1;
+
+      final lastLoginStr = prefs.getString('SAVED_LAST_LOGIN');
+      if (lastLoginStr != null) {
+        lastLogin.value = DateTime.tryParse(lastLoginStr);
+      }
+
+      final lastShareStr = prefs.getString('SAVED_LAST_SHARE');
+      if (lastShareStr != null) {
+        lastShareDate.value = DateTime.tryParse(lastShareStr);
+      }
+    } catch (e) {
+      debugPrint('Error loading local user data: $e');
+    }
+  }
+
+  /// Generate RFC4122 v4 UUID without external dependencies
+  static String _generateUuidV4() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant 10
+    final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20, 32)}';
+  }
+
+  /// Initialize authentication & cloud profile
   Future<void> _initAuth() async {
     isLoading.value = true;
 
-    // Check existing session
+    // Check existing Supabase session
     final session = _supabase.auth.currentSession;
     if (session != null) {
       currentUser.value = session.user;
       isLoggedIn.value = true;
-      await _loadProfile();
     } else {
       await signInAnonymously();
     }
 
+    // Ensure we have a unique default username if this is a new install
+    await _ensureDefaultUniqueUsername();
+
+    // Sync profile with cloud
+    await _loadProfile();
+
     isLoading.value = false;
   }
 
-  /// Anonymous sign-in
+  /// Anonymous sign-in attempt
   Future<void> signInAnonymously() async {
     try {
       final response = await _supabase.auth.signInAnonymously();
       if (response.user != null) {
         currentUser.value = response.user;
         isLoggedIn.value = true;
-        await _loadProfile();
       }
     } catch (e) {
-      debugPrint('Anonymous login error: $e');
-      // Fallback: work offline
+      debugPrint('Anonymous login error (using device ID): $e');
       isLoggedIn.value = false;
     }
   }
 
-  /// Load user profile from Supabase
+  /// Generate a unique default username per device
+  Future<void> _ensureDefaultUniqueUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    final existingName = prefs.getString('DEVICE_USERNAME');
+    if (existingName != null && existingName.isNotEmpty) {
+      odUsername.value = existingName;
+      return;
+    }
+
+    // List of math/puzzle themed prefixes
+    const prefixes = [
+      'MathWhiz',
+      'NumberNinja',
+      'EulerPrime',
+      'MatrixMaster',
+      'Brainiac',
+      'QuantumSolver',
+      'LogicPro',
+      'CalcMaster',
+      'Pythagoras',
+      'VectorKing',
+      'MathWizard',
+      'AlphaSolver'
+    ];
+
+    final rng = Random();
+    String candidate = '';
+    bool isUnique = false;
+    int attempts = 0;
+
+    while (!isUnique && attempts < 10) {
+      attempts++;
+      final prefix = prefixes[rng.nextInt(prefixes.length)];
+      final suffix = 1000 + rng.nextInt(9000);
+      candidate = '${prefix}_$suffix';
+
+      // Check against Supabase
+      try {
+        final existing = await _supabase
+            .from('profiles')
+            .select('id')
+            .ilike('username', candidate)
+            .maybeSingle();
+
+        if (existing == null) {
+          isUnique = true;
+        }
+      } catch (e) {
+        // If network issue, accept generated candidate
+        isUnique = true;
+      }
+    }
+
+    if (candidate.isEmpty) {
+      candidate = 'Player_${1000 + rng.nextInt(9000)}';
+    }
+
+    odUsername.value = candidate;
+    await prefs.setString('DEVICE_USERNAME', candidate);
+  }
+
+  /// Load user profile from Supabase and sync with local
   Future<void> _loadProfile() async {
-    if (currentUser.value == null) return;
+    final userId = effectiveUserId;
+    if (userId.isEmpty) return;
 
     try {
       final data = await _supabase
           .from('profiles')
           .select()
-          .eq('id', currentUser.value!.id)
-          .single();
+          .eq('id', userId)
+          .maybeSingle();
 
-      odUsername.value = data['username'] ?? 'Player';
-      avatarId.value = data['avatar_id'] ?? 0;
-      totalXp.value = data['total_xp'] ?? 0;
-      loginStreak.value = data['login_streak'] ?? 0;
+      if (data == null) {
+        // Create initial profile in cloud
+        final newProfile = {
+          'id': userId,
+          'username': odUsername.value,
+          'avatar_id': avatarId.value,
+          'total_xp': totalXp.value,
+          'coin_balance': Get.find<CurrencyController>().coinBalance.value,
+          'login_streak': loginStreak.value,
+          'last_login': DateTime.now().toUtc().toIso8601String(),
+          'created_at': DateTime.now().toUtc().toIso8601String(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        };
+
+        await _supabase.from('profiles').upsert(newProfile);
+        await _checkDailyLogin();
+        return;
+      }
+
+      // Existing cloud profile: sync values
+      if (data['username'] != null && data['username'].toString().trim().isNotEmpty) {
+        odUsername.value = data['username'].toString().trim();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('DEVICE_USERNAME', odUsername.value);
+      }
+
+      avatarId.value = (data['avatar_id'] as num?)?.toInt() ?? avatarId.value;
+
+      final cloudXp = (data['total_xp'] as num?)?.toInt() ?? 0;
+      if (cloudXp > totalXp.value) {
+        totalXp.value = cloudXp;
+      } else if (totalXp.value > cloudXp) {
+        // Local XP is higher, update cloud
+        await _updateProfile({'total_xp': totalXp.value});
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('SAVED_TOTAL_XP', totalXp.value);
+      await prefs.setInt('SAVED_AVATAR_ID', avatarId.value);
+
+      loginStreak.value = (data['login_streak'] as num?)?.toInt() ?? loginStreak.value;
 
       if (data['last_login'] != null) {
-        lastLogin.value = DateTime.parse(data['last_login']);
+        lastLogin.value = DateTime.tryParse(data['last_login']);
       }
       if (data['last_share_date'] != null) {
-        lastShareDate.value = DateTime.parse(data['last_share_date']);
+        lastShareDate.value = DateTime.tryParse(data['last_share_date']);
       }
 
-      // Sync coins with local (use higher value)
-      await _syncCoins(data['coin_balance'] ?? 100);
+      // Sync coins (use higher value)
+      await _syncCoins((data['coin_balance'] as num?)?.toInt() ?? 100);
 
-      // Check for daily reward
+      // Check daily login
       await _checkDailyLogin();
     } catch (e) {
       debugPrint('Load profile error: $e');
@@ -109,18 +261,14 @@ class UserController extends GetxController {
     final currencyController = Get.find<CurrencyController>();
     final localCoins = currencyController.coinBalance.value;
 
-    // Use the higher value to prevent data loss
     final syncedCoins = localCoins > cloudCoins ? localCoins : cloudCoins;
 
-    // Update local
     if (syncedCoins != localCoins) {
       currencyController.setCoins(syncedCoins);
     }
 
-    // Update cloud if local was higher
-    if (localCoins > cloudCoins && currentUser.value != null) {
-      await _supabase.from('profiles').update({'coin_balance': syncedCoins}).eq(
-          'id', currentUser.value!.id);
+    if (localCoins > cloudCoins) {
+      await _updateProfile({'coin_balance': syncedCoins});
     }
   }
 
@@ -130,7 +278,6 @@ class UserController extends GetxController {
     final today = DateTime(now.year, now.month, now.day);
 
     if (lastLogin.value == null) {
-      // First login ever
       loginStreak.value = 1;
       hasDailyReward.value = true;
       dailyRewardAmount.value = SupabaseConfig.getDailyReward(1);
@@ -144,25 +291,24 @@ class UserController extends GetxController {
       final difference = today.difference(lastDate).inDays;
 
       if (difference == 0) {
-        // Already logged in today
         hasDailyReward.value = false;
       } else if (difference == 1) {
-        // Consecutive day - increment streak
         loginStreak.value++;
         hasDailyReward.value = true;
         dailyRewardAmount.value =
             SupabaseConfig.getDailyReward(loginStreak.value);
       } else {
-        // Missed days - reset streak
         loginStreak.value = 1;
         hasDailyReward.value = true;
         dailyRewardAmount.value = SupabaseConfig.getDailyReward(1);
       }
     }
 
-    // Update last_login
     lastLogin.value = now;
-    await _updateProfile({'last_login': now.toIso8601String()});
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('SAVED_LAST_LOGIN', now.toIso8601String());
+    await prefs.setInt('SAVED_LOGIN_STREAK', loginStreak.value);
+    await _updateProfile({'last_login': now.toUtc().toIso8601String(), 'login_streak': loginStreak.value});
   }
 
   /// Claim daily reward
@@ -174,7 +320,6 @@ class UserController extends GetxController {
 
     hasDailyReward.value = false;
 
-    // Update streak in database
     await _updateProfile({
       'login_streak': loginStreak.value,
     });
@@ -184,54 +329,51 @@ class UserController extends GetxController {
         "🎁 Daily Reward!",
         "+$amount Coins (Day ${loginStreak.value} Streak)",
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green.withOpacity(0.9),
+        backgroundColor: Colors.green.withValues(alpha: 0.9),
         colorText: Colors.white,
         duration: const Duration(seconds: 3),
       );
     });
   }
 
-  /// Check if username is available (excluding current user)
+  /// Check if username is available (excluding current device/user)
   Future<dynamic> isUsernameAvailable(String username) async {
-    // Check internet connection first (mock for now or basic check)
     try {
-      // Simple connectivity check
-      // If we are already in offline mode fallback
-      if (isOffline.value) return "OFFLINE";
+      final trimmed = username.trim();
+      if (trimmed.isEmpty || trimmed.length < 3) return false;
 
-      if (currentUser.value == null) return false;
-      if (username.trim().isEmpty) return false;
+      // If user kept the same name, it's valid
+      if (trimmed.toLowerCase() == odUsername.value.toLowerCase()) return true;
 
       final result = await _supabase
           .from('profiles')
-          .select()
-          .eq('username', username.trim())
-          .neq('id', currentUser.value!.id)
+          .select('id')
+          .ilike('username', trimmed)
+          .neq('id', effectiveUserId)
           .maybeSingle();
 
-      // If result is null, username is available
+      // If result is null, username is not taken
       return result == null;
     } catch (e) {
       debugPrint('Username check error: $e');
-      // Assume offline/error
       return "OFFLINE";
     }
   }
 
   /// Update username (with uniqueness validation)
   Future<void> updateUsername(String newName) async {
-    if (newName.trim().isEmpty) return;
+    final trimmed = newName.trim();
+    if (trimmed.isEmpty || trimmed.length < 3) return;
 
-    // Check availability
-    final result = await isUsernameAvailable(newName);
+    final result = await isUsernameAvailable(trimmed);
 
     if (result == "OFFLINE") {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.snackbar(
-          "📡 No Internet",
-          "Please check your internet connection.",
+          "📡 Connection Error",
+          "Could not verify username. Please check your internet connection.",
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.orange.withOpacity(0.9),
+          backgroundColor: Colors.orange.withValues(alpha: 0.9),
           colorText: Colors.white,
         );
       });
@@ -242,9 +384,9 @@ class UserController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.snackbar(
           "❌ Error",
-          "Username '$newName' is already taken! Try another.",
+          "Username '$trimmed' is already taken! Try another.",
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
           colorText: Colors.white,
         );
       });
@@ -252,8 +394,15 @@ class UserController extends GetxController {
     }
 
     // Username is available, proceed with update
-    odUsername.value = newName.trim();
+    odUsername.value = trimmed;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('DEVICE_USERNAME', trimmed);
     await _updateProfile({'username': odUsername.value});
+
+    // Refresh leaderboard so new name displays immediately
+    if (Get.isRegistered<LeaderboardController>()) {
+      Get.find<LeaderboardController>().refresh();
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.snackbar("✅ Updated", "Username changed to ${odUsername.value}",
@@ -263,29 +412,30 @@ class UserController extends GetxController {
 
   /// Update avatar
   Future<void> updateAvatar(int newAvatarId) async {
-    // Check for premium avatars (ID > 4)
-    if (newAvatarId > 4) {
-      final iapController = Get.find<InAppPurchaseController>();
-      if (!iapController.isPro.value) {
-        // Redirect to Go Pro screen if trying to select locked avatar
-        Get.to(() => const GoProScreen());
-        return;
-      }
-    }
-
     avatarId.value = newAvatarId.clamp(0, 25);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('SAVED_AVATAR_ID', avatarId.value);
     await _updateProfile({'avatar_id': avatarId.value});
+    if (Get.isRegistered<LeaderboardController>()) {
+      Get.find<LeaderboardController>().refresh();
+    }
   }
 
-  /// Add XP (called from game controllers)
+  /// Add XP (called from any game controller when user solves or wins)
   Future<void> addXp(int amount) async {
     totalXp.value += amount;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('SAVED_TOTAL_XP', totalXp.value);
     await _updateProfile({'total_xp': totalXp.value});
+
+    // Refresh leaderboard live
+    if (Get.isRegistered<LeaderboardController>()) {
+      Get.find<LeaderboardController>().refresh();
+    }
   }
 
   /// Update cloud coins (called from CurrencyController)
   Future<void> updateCloudCoins(int coins) async {
-    if (currentUser.value == null) return;
     await _updateProfile({'coin_balance': coins});
   }
 
@@ -305,39 +455,31 @@ class UserController extends GetxController {
         );
 
         if (today.isAtSameMomentAs(lastDate)) {
-          debugPrint("UserController: Already shared today");
-          debugPrint("UserController: Already shared today");
           if (Get.context != null) {
             ScaffoldMessenger.of(Get.context!).showSnackBar(
-              SnackBar(
-                content: const Text(
+              const SnackBar(
+                content: Text(
                     "You've already earned your share reward today!"),
                 backgroundColor: Colors.orange,
-                duration: const Duration(seconds: 3),
+                duration: Duration(seconds: 3),
               ),
             );
-          } else {
-            // Fallback if context is somehow null
-            debugPrint(
-                "UserController: Get.context is null, cannot show snackbar");
           }
           return;
         }
       }
 
-      debugPrint("UserController: Invoking Share.share");
-      // Open share dialog
       final result = await Share.share(
         "🧠 Challenge your brain with OMath Puzzle! Can you beat my score? Download now!",
         subject: "OMath Puzzle Game",
       );
-      debugPrint("UserController: Share result: ${result.status}");
 
-      // If shared successfully, give reward
       if (result.status == ShareResultStatus.success ||
           result.status == ShareResultStatus.dismissed) {
         lastShareDate.value = now;
-        await _updateProfile({'last_share_date': now.toIso8601String()});
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('SAVED_LAST_SHARE', now.toIso8601String());
+        await _updateProfile({'last_share_date': now.toUtc().toIso8601String()});
 
         Get.find<CurrencyController>()
             .addCoins(SupabaseConfig.shareRewardCoins);
@@ -362,15 +504,20 @@ class UserController extends GetxController {
     }
   }
 
-  /// Helper: Update profile in Supabase
+  /// Helper: Upsert profile in Supabase
   Future<void> _updateProfile(Map<String, dynamic> data) async {
-    if (currentUser.value == null) return;
+    final userId = effectiveUserId;
+    if (userId.isEmpty) return;
 
     try {
-      await _supabase
-          .from('profiles')
-          .update(data)
-          .eq('id', currentUser.value!.id);
+      data['updated_at'] = DateTime.now().toUtc().toIso8601String();
+      await _supabase.from('profiles').upsert({
+        'id': userId,
+        'username': odUsername.value,
+        'avatar_id': avatarId.value,
+        'total_xp': totalXp.value,
+        ...data,
+      });
     } catch (e) {
       debugPrint('Update profile error: $e');
     }

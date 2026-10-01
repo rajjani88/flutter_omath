@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build/
+
+# MCP configuration (project-specific & sensitive)
+.agents/
+mcp_config.json
+.vscode/mcp.json
+

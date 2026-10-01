@@ -37,7 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "title": "Achieve Greatness",
       "description":
-          "Unlock new challenges, collect achievements, and become a MathWize Pro.",
+          "Unlock new challenges, collect achievements, and become a MathWize.",
       "icon": Icons.emoji_events_rounded,
       "color": GameColors.secondary,
     },
@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          
+
           // Page View
           PageView.builder(
             controller: _pageController,
@@ -101,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               return _buildPage(_onboardingData[index]);
             },
           ),
-          
+
           // Bottom Navigation Area
           Positioned(
             bottom: 40,
@@ -129,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Next / Get Started Button
                 GestureDetector(
                   onTap: _nextPage,
@@ -189,7 +189,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 60),
-          
+
           // Title
           Text(
             data['title'],
@@ -202,7 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Description
           Text(
             data['description'],

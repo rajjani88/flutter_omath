@@ -8,28 +8,29 @@ publish_to: 'none'
 version: 1.17.0+17
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.6.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
   get: ^4.7.2
   collection: ^1.19.1
-  url_launcher: ^6.3.1
-  fluttertoast: ^8.2.12
-  in_app_purchase: ^3.3.0
-  in_app_purchase_android: ^0.5.0
-  shared_preferences: ^2.5.3
-  audioplayers: ^6.1.0
+  url_launcher: ^6.3.2
+  fluttertoast: ^8.2.14
+  in_app_purchase: ^3.3.1
+  in_app_purchase_android: ^0.5.3
+  shared_preferences: ^2.5.5
+  audioplayers: ^6.8.1
   confetti: ^0.8.0
-  google_fonts: ^7.0.2
+  google_fonts: ^7.1.0
   animate_do: ^4.2.0
-  supabase_flutter: ^2.8.4
+  supabase_flutter: ^2.18.0
   share_plus: ^10.1.4
   flutter_screenutil: ^5.9.3
-  flutter_dotenv: ^6.0.0
+  flutter_dotenv: ^6.0.1
+  google_mobile_ads: ^9.1.0
  
 
 dev_dependencies:

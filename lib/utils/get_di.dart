@@ -10,6 +10,7 @@ import 'package:flutter_omath/controllers/math_maze_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/controllers/sudoku_controller.dart';
+import 'package:flutter_omath/controllers/ads_controller.dart';
 import 'package:flutter_omath/utils/sharedprefs.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,11 +29,12 @@ Future<void> init() async {
   Get.lazyPut(() => SudokuController(), fenix: true);
 
   // Core App Controllers
-  Get.lazyPut(() => InAppPurchaseController(sp: Get.find()), fenix: true);
+  //Get.lazyPut(() => InAppPurchaseController(sp: Get.find()), fenix: true);
   Get.lazyPut(() => SoundController(), fenix: true);
   Get.lazyPut(() => CurrencyController(), fenix: true);
   Get.lazyPut(() => DailyChallengeController(prefs: sharedPreferences),
       fenix: true);
+  Get.lazyPut(() => AdsController(), fenix: true);
 
   // Social/Leaderboard Controllers
   Get.lazyPut(() => UserController(), fenix: true);

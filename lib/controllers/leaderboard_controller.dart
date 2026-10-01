@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_omath/controllers/user_controller.dart';
+
 
 /// Leaderboard entry model
 class LeaderboardEntry {
@@ -59,7 +61,9 @@ class LeaderboardController extends GetxController {
           .order('total_xp', ascending: false)
           .limit(50);
 
-      final currentUserId = _supabase.auth.currentUser?.id;
+      final currentUserId = Get.isRegistered<UserController>()
+          ? Get.find<UserController>().effectiveUserId
+          : _supabase.auth.currentUser?.id;
 
       topPlayers.clear();
       int rank = 0;
@@ -78,12 +82,24 @@ class LeaderboardController extends GetxController {
       }
 
       // Fetch current user's rank if not in top 50
-      if (!currentUserInTop50 && currentUserId != null) {
+      if (!currentUserInTop50 && currentUserId != null && currentUserId.isNotEmpty) {
         await _fetchCurrentUserRank(currentUserId);
       } else if (currentUserInTop50) {
         currentUserEntry.value =
             topPlayers.firstWhereOrNull((e) => e.isCurrentUser);
         currentUserRank.value = currentUserEntry.value?.rank ?? 0;
+      }
+
+      // Fallback: If user entry is not found in cloud, show local profile badge
+      if (currentUserEntry.value == null && Get.isRegistered<UserController>()) {
+        final userCtrl = Get.find<UserController>();
+        currentUserEntry.value = LeaderboardEntry(
+          odUsername: userCtrl.odUsername.value,
+          avatarId: userCtrl.avatarId.value,
+          totalXp: userCtrl.totalXp.value,
+          rank: currentUserRank.value > 0 ? currentUserRank.value : topPlayers.length + 1,
+          isCurrentUser: true,
+        );
       }
 
       isLoading.value = false;
@@ -102,9 +118,14 @@ class LeaderboardController extends GetxController {
           .from('profiles')
           .select('username, avatar_id, total_xp')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
-      final userXp = userData['total_xp'] ?? 0;
+      int userXp = 0;
+      if (userData != null) {
+        userXp = (userData['total_xp'] as num?)?.toInt() ?? 0;
+      } else if (Get.isRegistered<UserController>()) {
+        userXp = Get.find<UserController>().totalXp.value;
+      }
 
       // Count how many players have higher XP
       final countResponse =
@@ -113,15 +134,28 @@ class LeaderboardController extends GetxController {
       final rank = (countResponse as List).length + 1;
 
       currentUserRank.value = rank;
-      currentUserEntry.value = LeaderboardEntry.fromJson(
-        userData,
-        rank,
-        isCurrentUser: true,
-      );
+      if (userData != null) {
+        currentUserEntry.value = LeaderboardEntry.fromJson(
+          userData,
+          rank,
+          isCurrentUser: true,
+        );
+      } else if (Get.isRegistered<UserController>()) {
+        final u = Get.find<UserController>();
+        currentUserEntry.value = LeaderboardEntry(
+          odUsername: u.odUsername.value,
+          avatarId: u.avatarId.value,
+          totalXp: userXp,
+          rank: rank,
+          isCurrentUser: true,
+        );
+      }
     } catch (e) {
       debugPrint('Fetch user rank error: $e');
     }
   }
+
+
 
   /// Refresh leaderboard
   Future<void> refresh() async {

@@ -1,22 +1,17 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
-import 'package:flutter_omath/controllers/sound_controller.dart';
 import 'package:flutter_omath/utils/supabase_config.dart';
-import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:flutter_omath/widgets/glass_card.dart';
 import 'package:flutter_omath/widgets/juicy_button.dart';
-import 'package:flutter_omath/widgets/tutorial_overlay.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_omath/widgets/avatar_gallery_modal.dart';
 import 'package:flutter_omath/widgets/streak_components.dart';
 import 'package:flutter_omath/utils/game_colors.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -28,7 +23,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   final UserController userController = Get.find<UserController>();
-  final SoundController soundController = Get.find<SoundController>();
   final TextEditingController nameController = TextEditingController();
 
   // Username validation state
@@ -38,11 +32,19 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
+  Timer? _adsTimer;
 
   @override
   void initState() {
     super.initState();
     nameController.text = userController.odUsername.value;
+    ever(userController.odUsername, (String newName) {
+      if (mounted && (nameController.text == 'Player' || nameController.text.isEmpty)) {
+        setState(() {
+          nameController.text = newName;
+        });
+      }
+    });
 
     // Bounce Animation for Avatar (slight floating effect)
     _bounceController = AnimationController(
@@ -53,6 +55,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     _bounceAnimation = Tween<double>(begin: -5, end: 5).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
+    showAds();
+  }
+
+  showAds() {
+    if (_adsTimer != null) {
+      return;
+    }
+    log('timer is started');
+    _adsTimer = Timer(const Duration(seconds: 10), () {
+    });
   }
 
   @override
@@ -60,6 +72,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     nameController.dispose();
     _bounceController.dispose();
     _debounce?.cancel();
+    if (_adsTimer != null) {
+      _adsTimer!.cancel();
+    }
     super.dispose();
   }
 
@@ -453,95 +468,14 @@ class _ProfileScreenState extends State<ProfileScreen>
 
               const SizedBox(height: 24),
 
-              // Settings - Audio Section
-              _buildSectionTitle("AUDIO & HAPTICS"),
-              const SizedBox(height: 10),
-
-              Obx(() => _buildGlassSwitch(
-                    label: "Background Music",
-                    icon: Icons.music_note_rounded,
-                    value: soundController.isMusicOn.value,
-                    onChanged: (val) => soundController.toggleMusic(val),
-                    color: Colors.purpleAccent,
-                  )),
-              const SizedBox(height: 12),
-
-              Obx(() => _buildGlassSwitch(
-                    label: "Sound Effects",
-                    icon: Icons.volume_up_rounded,
-                    value: soundController.isSfxOn.value,
-                    onChanged: (val) => soundController.toggleSfx(val),
-                    color: Colors.blueAccent,
-                  )),
-              const SizedBox(height: 12),
-
-              Obx(() => _buildGlassSwitch(
-                    label: "Vibration",
-                    icon: Icons.vibration_rounded,
-                    value: soundController.isVibrationOn.value,
-                    onChanged: (val) => soundController.toggleVibration(val),
-                    color: Colors.orangeAccent,
+              // 3. Daily Streak (New Infinite Design)
+              Obx(() => StreakProfileCard(
+                    streakCount: userController.loginStreak.value,
                   )),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // Settings - Support Section
-              _buildSectionTitle("SUPPORT & INFO"),
-              const SizedBox(height: 10),
-
-              _buildGlassButton(
-                label: "How to Play",
-                icon: Icons.help_outline_rounded,
-                onTap: () => TutorialOverlay.show(),
-              ),
-              const SizedBox(height: 12),
-
-              _buildGlassButton(
-                label: "Privacy Policy",
-                icon: Icons.privacy_tip_outlined,
-                onTap: () async {
-                  const url = AppConfig.privacyPolicyUrl;
-                  if (!await launchUrl(Uri.parse(url))) {
-                    Get.snackbar("Error", "Could not launch URL");
-                  }
-                },
-              ),
-              const SizedBox(height: 12),
-
-              _buildGlassButton(
-                label: "Terms & Conditions",
-                icon: Icons.description_outlined,
-                onTap: () async {
-                  const url = AppConfig.termsUrl;
-                  if (!await launchUrl(Uri.parse(url))) {
-                    Get.snackbar("Error", "Could not launch URL");
-                  }
-                },
-              ),
-              const SizedBox(height: 12),
-
-              _buildGlassButton(
-                label: "Rate Us",
-                icon: Icons.star_rate_rounded,
-                onTap: () async {
-                  final Uri marketUri = Uri.parse(AppConfig.rateUsUrl);
-                  final Uri webUri = Uri.parse(AppConfig.rateUsWebUrl);
-
-                  if (await canLaunchUrl(marketUri)) {
-                    await launchUrl(marketUri,
-                        mode: LaunchMode.externalApplication);
-                  } else if (await canLaunchUrl(webUri)) {
-                    await launchUrl(webUri,
-                        mode: LaunchMode.externalApplication);
-                  } else {
-                    Get.snackbar("Error", "Could not open store");
-                  }
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              // Share Button (JuicyButton)
+              // 4. Share Button (JuicyButton)
               JuicyButton(
                 color: GameColors.secondary, // Sky Blue
                 icon: Icons.share_rounded,
@@ -549,134 +483,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                 onTap: () => userController.shareApp(),
               ),
 
-              const SizedBox(height: 32),
-
-              Center(
-                child: Text(
-                  "Version 1.9.0",
-                  style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      color: Colors.white30,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-
               const SizedBox(height: 48), // Bottom padding
             ],
           ),
         ),
       ),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, bottom: 4),
-      child: Text(
-        title,
-        style: GoogleFonts.outfit(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFC084FC),
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassSwitch({
-    required String label,
-    required IconData icon,
-    required bool value,
-    required Function(bool) onChanged,
-    required Color color,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  label,
-                  style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Switch.adaptive(
-                value: value,
-                onChanged: onChanged,
-                activeColor: color,
-                activeTrackColor: color.withOpacity(0.4),
-                inactiveThumbColor: Colors.grey.shade400,
-                inactiveTrackColor: Colors.white10,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.white70, size: 22),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: GoogleFonts.outfit(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded,
-                    color: Colors.white30, size: 16),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

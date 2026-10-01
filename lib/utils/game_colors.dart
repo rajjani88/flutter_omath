@@ -17,10 +17,6 @@ class GameColors {
   static const Color danger = Color(0xFFF43F5E); // Rose 500
   static const Color dangerShadow = Color(0xFFBE123C); // Rose 700
 
-  // Warning/Amber (Gold/Amber)
-  static const Color warning = Color(0xFFF59E0B); // Amber 500
-  static const Color warningShadow = Color(0xFFD97706); // Amber 600
-
   // Success (Emerald/Green)
   static const Color success = Color(0xFF10B981); // Emerald 500
   static const Color successShadow = Color(0xFF047857); // Emerald 700

@@ -22,6 +22,31 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   final LeaderboardController controller = Get.find<LeaderboardController>();
+  Timer? _adsTimer;
+
+  void showAds() {
+    if (_adsTimer != null) {
+      return;
+    }
+    log('timer is started');
+    _adsTimer = Timer(const Duration(seconds: 13), () {
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    showAds();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_adsTimer != null) {
+      _adsTimer!.cancel();
+      _adsTimer = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +60,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
-                const GlassBackButton(),
+                GlassBackButton(onTap: () => Get.back()),
                 const SizedBox(width: 16),
                 Text(
                   "🏆 Leaderboard",

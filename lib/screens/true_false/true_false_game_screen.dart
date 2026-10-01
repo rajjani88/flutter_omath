@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/widgets/game_result_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 class TrueFalseGame extends StatefulWidget {
   const TrueFalseGame({super.key});
 
@@ -23,10 +24,10 @@ class TrueFalseGame extends StatefulWidget {
 
 class _TrueFalseGameState extends State<TrueFalseGame> {
   //
- // Used inside controller mostly or for interstitial
+  // Used inside controller mostly or for interstitial
   // InAppPurchaseController purchaseController = Get.find(); // Used locally for restart
   final SoundController soundController = Get.find<SoundController>();
-  final InAppPurchaseController purchaseController = Get.find();
+  // final InAppPurchaseController purchaseController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +190,6 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                           )),
                       const SizedBox(height: 20),
 
-                      
                       const SizedBox(height: 20),
                     ],
                   );
@@ -205,8 +205,8 @@ class _TrueFalseGameState extends State<TrueFalseGame> {
                   isTimeUp: false,
                   onRetry: () {
                     // Logic for retry
-                    if (!purchaseController.isPro.value) {
-                    }
+                    // if (!purchaseController.isPro.value) {
+                    // }
                     controller.startGame();
                   },
                   onHome: () => Get.offAll(() => const HomeScreen()),

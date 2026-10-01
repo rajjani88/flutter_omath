@@ -3,19 +3,6 @@ class AppConfig {
   static const String appName = "Mathwize";
   static const String appVersion = "1.13.0";
 
-  // --- REVENUECAT SUBSCRIPTIONS ---
-  static const String revenueCatApiKeyApple =
-      "appl_placeholder_key"; // Replace with live RevenueCat Apple API Key
-  static const String revenueCatApiKeyGoogle =
-      "goog_placeholder_key"; // Replace with live RevenueCat Google API Key
-  static const String proEntitlementId = "pro";
-
-  // --- REVENUECAT PACKAGE IDS ---
-  static const String idWeekly = "mathwize_pro_weekly";
-  static const String idMonthly = "mathwize_pro_monthly";
-  static const String idYearly = "mathwize_pro_yearly";
-  static const String idLifetime = "mathwize_pro_lifetime";
-
   // --- LINKS & SUPPORT ---
   static const String privacyPolicyUrl =
       'https://sites.google.com/view/brainy-math-app/privacy-policy';
@@ -40,8 +27,6 @@ class AppConfig {
   static const int costFreeze = 50;
   static const int costSkip = 100;
   static const int costHint = 30;
-  static const int costSolve = 200;
-  static const int costLife = 200;
   static const int durationFreezeSeconds = 10;
 
   // --- GAMEPLAY CONSTANTS ---
@@ -71,8 +56,6 @@ const int kCoinsFromAd = AppConfig.coinsFromAd;
 const int kFreezeCost = AppConfig.costFreeze;
 const int kSkipCost = AppConfig.costSkip;
 const int kHintCost = AppConfig.costHint;
-const int kSolveCost = AppConfig.costSolve;
-const int kLifeCost = AppConfig.costLife;
 const int kFreezeDuration = AppConfig.durationFreezeSeconds;
 
 // Restore missing global constants for backward compatibility

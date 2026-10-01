@@ -7,7 +7,6 @@ import 'package:flutter_omath/widgets/floating_background.dart'; // New Import
 import 'package:flutter_omath/widgets/streak_components.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
 import 'package:flutter_omath/controllers/user_controller.dart';
-import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,8 +21,31 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   final UserController userController = Get.find<UserController>();
   final AchievementController achievementController =
       Get.find<AchievementController>();
-  final DailyChallengeController dailyController =
-      Get.find<DailyChallengeController>();
+
+  // Theme Colors
+  Timer? _adsTimer;
+
+  void showAds() {
+    if (_adsTimer != null) {
+      return;
+    }
+    log('timer is started');
+    _adsTimer = Timer(const Duration(seconds: 13), () {
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    showAds();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _adsTimer?.cancel();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +60,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         leadingWidth: 70,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const Center(child: GlassBackButton()),
+        leading: Center(child: GlassBackButton(onTap: () => Get.back())),
         title: Text(
           "Achievements",
           style: GoogleFonts.outfit(
@@ -71,7 +93,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
               children: [
                 // Streak Card
                 Obx(() => StreakHomeCard(
-                      streakCount: dailyController.currentStreak.value,
+                      streakCount: userController.loginStreak.value,
                     )),
 
                 const SizedBox(height: 30),

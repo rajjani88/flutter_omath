@@ -3,8 +3,18 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseConfig {
-  static String supabaseUrl = dotenv.env['supabase_url'] ?? '';
-  static String supabaseAnonKey = dotenv.env['supabase_anonkey'] ?? '';
+  static String get supabaseUrl =>
+      dotenv.env['NEXT_PUBLIC_SUPABASE_URL'] ??
+      dotenv.env['supabase_url'] ??
+      dotenv.env['SUPABASE_URL'] ??
+      '';
+
+  static String get supabaseAnonKey =>
+      dotenv.env['NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'] ??
+      dotenv.env['supabase_anonkey'] ??
+      dotenv.env['SUPABASE_ANON_KEY'] ??
+      '';
+
   // Avatar asset paths (based on avatar_id 0-4)
   static String getAvatarPath(int avatarId) {
     // Clamp to valid range (0-25)

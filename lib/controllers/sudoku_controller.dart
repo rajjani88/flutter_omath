@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:flutter_omath/controllers/achievement_controller.dart';
+
 import 'package:flutter_omath/controllers/currency_controller.dart';
 import 'package:flutter_omath/controllers/daily_challenge_controller.dart';
 import 'package:flutter_omath/controllers/sound_controller.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_omath/controllers/user_controller.dart';
 import 'package:flutter_omath/screens/home_screen/home_screen.dart';
 import 'package:flutter_omath/utils/consts.dart';
 import 'package:flutter_omath/utils/sudoku_utils.dart';
+import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:flutter_omath/widgets/daily_challenge_success_popup.dart';
 import 'package:get/get.dart';
 
@@ -186,6 +187,7 @@ class SudokuController extends GetxController {
     if (allFilled) {
       isGameWon.value = true;
       _stopTimer();
+      _rewardUser();
 
       if (isDailyChallenge) {
         final dc = Get.find<DailyChallengeController>();
@@ -197,8 +199,6 @@ class SudokuController extends GetxController {
           ),
           barrierDismissible: false,
         );
-      } else {
-        _rewardUser();
       }
     }
   }
@@ -206,12 +206,13 @@ class SudokuController extends GetxController {
   void _rewardUser() {
     Get.find<CurrencyController>()
         .addCoins(kCoinsPerCorrectAnswer * 2); // Double for Sudoku
-    Get.find<UserController>().addXp(20);
+    Get.find<UserController>().addXp(SupabaseConfig.xpPerCorrectAnswer);
     try {
       Get.find<AchievementController>().checkEvents('correct_answer', null);
       Get.find<AchievementController>().checkEvents('game_played', null);
     } catch (_) {}
   }
+
 
   String formatTime() {
     int minutes = timerSeconds.value ~/ 60;

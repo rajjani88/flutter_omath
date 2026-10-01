@@ -7,7 +7,9 @@ import 'package:flutter_omath/widgets/game_background.dart';
 import 'package:flutter_omath/widgets/glass_back_button.dart';
 import 'package:flutter_omath/widgets/unified_success_popup.dart';
 import 'package:flutter_omath/utils/sudoku_utils.dart';
+import 'package:flutter_omath/utils/supabase_config.dart';
 import 'package:flutter_omath/widgets/reward_choice_dialog.dart';
+
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 class SudokuScreen extends StatelessWidget {
@@ -111,15 +113,16 @@ class SudokuScreen extends StatelessWidget {
           ),
 
           // Win Result Popup
-          Obx(() => controller.isGameWon.value
+          Obx(() => controller.isGameWon.value && !controller.isDailyChallenge
               ? UnifiedSuccessPopup(
                   coins: kCoinsPerCorrectAnswer * 2,
-                  xp: 20,
+                  xp: SupabaseConfig.xpPerCorrectAnswer,
                   time: controller.formatTime(),
                   onNext: () => controller.startNewGame(),
                   onHome: () => Get.back(),
                 )
               : const SizedBox.shrink()),
+
         ],
       ),
     );
